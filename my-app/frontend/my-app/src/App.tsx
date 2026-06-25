@@ -3,13 +3,9 @@ import type { WeatherData, ActivityType, TabType, Recommendations, City } from '
 import { moroccanCities } from './data/moroccanCities';
 import { fetchWeather, fetchRecommendations } from './api';
 import Header from './components/Header';
-import CurrentWeather from './components/CurrentWeather';
-import RecommendationCards from './components/RecommendationCards';
-import AllergyCard from './components/AllergyCard';
 import BottomNav from './components/BottomNav';
 import DesktopSidebar from './components/DesktopSidebar';
-import ForecastWidget from './components/ForecastWidget';
-import TipsWidget from './components/TipsWidget';
+import HomeView from './components/HomeView';
 import ActivitiesView from './components/ActivitiesView';
 import HealthView from './components/HealthView';
 import ProfileView from './components/ProfileView';
@@ -61,6 +57,7 @@ function App() {
   const userName = 'Ahmed';
 
   useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
@@ -90,16 +87,6 @@ function App() {
     setRetryCount(n => n + 1);
   };
 
-  const getConditionDescription = (cond: string) => {
-    switch (cond) {
-      case 'sunny': return 'Clear sky, high heat';
-      case 'partly-cloudy': return 'Partly cloudy, warm';
-      case 'cloudy': return 'Overcast, mild';
-      case 'windy': return 'Windy, dusty conditions';
-      default: return 'Clear sky';
-    }
-  };
-
   return (
     <div className="app">
       <DesktopSidebar
@@ -113,10 +100,7 @@ function App() {
       <main className="main-content">
         <Header
           city={city}
-          userName={userName}
           onCityChange={handleCityChange}
-          onToggleDark={() => setIsDark(!isDark)}
-          isDark={isDark}
         />
 
         {fetchState.error && (
@@ -141,30 +125,11 @@ function App() {
         {!fetchState.loading && !fetchState.error && fetchState.weather && fetchState.recommendations && (
           <>
             {activeTab === 'home' && (
-              <>
-                <div className="condition-badge">
-                  {getConditionDescription(fetchState.weather.condition)}
-                </div>
-
-                <CurrentWeather data={fetchState.weather} cityName={city.name} />
-
-                <div className="desktop-grid">
-                  <div className="mobile-column">
-                    <RecommendationCards
-                      recommendations={fetchState.recommendations}
-                      activity={activity}
-                      onActivityChange={handleActivityChange}
-                    />
-
-                    <AllergyCard alert={fetchState.recommendations.allergy} />
-                  </div>
-
-                  <div className="desktop-right-col">
-                    <ForecastWidget forecast={fetchState.weather.forecast} />
-                    <TipsWidget weather={fetchState.weather} />
-                  </div>
-                </div>
-              </>
+              <HomeView
+                weather={fetchState.weather}
+                recommendations={fetchState.recommendations}
+                cityName={city.name}
+              />
             )}
 
             {activeTab === 'activities' && (

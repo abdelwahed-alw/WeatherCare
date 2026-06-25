@@ -1,5 +1,5 @@
 import type { WeatherData } from '../types';
-import { SunIcon, DropletIcon } from './Icons';
+import { PsychologyIcon } from './Icons';
 
 interface TipsWidgetProps {
   weather: WeatherData;
@@ -33,15 +33,15 @@ export default function TipsWidget({ weather }: TipsWidgetProps) {
   }
 
   return (
-    <div className="tips-widget glass-card animate-in animate-in-delay-4">
-      <h3 className="widget-title">
-        <SunIcon size={18} />
+    <div className="aura-card p-lg animate-in">
+      <h3 className="font-headline-md text-headline-md flex items-center gap-sm mb-md">
+        <PsychologyIcon className="text-primary" />
         Today's Tips
       </h3>
-      <ul className="tips-list">
+      <ul className="space-y-sm">
         {tips.slice(0, 4).map((tip, i) => (
-          <li key={i} className="tip-item">
-            <DropletIcon size={14} />
+          <li key={i} className="flex items-start gap-sm text-body-md text-on-surface-variant">
+            <span className="material-symbols-outlined text-primary text-sm flex-shrink-0 mt-0.5">water_drop</span>
             <span>{tip}</span>
           </li>
         ))}

@@ -1,32 +1,39 @@
 import type { TabType } from '../types';
-import { HomeIcon, ActivityIcon, HeartIcon, ProfileIcon } from './Icons';
 
 interface BottomNavProps {
   active: TabType;
   onTabChange: (tab: TabType) => void;
 }
 
-const tabs: { id: TabType; label: string; icon: typeof HomeIcon }[] = [
-  { id: 'home', label: 'Home', icon: HomeIcon },
-  { id: 'activities', label: 'Activities', icon: ActivityIcon },
-  { id: 'health', label: 'Health', icon: HeartIcon },
-  { id: 'profile', label: 'Profile', icon: ProfileIcon },
+const tabs: { id: TabType; label: string; icon: string }[] = [
+  { id: 'home', label: 'Home', icon: 'home' },
+  { id: 'activities', label: 'Activities', icon: 'fitness_center' },
+  { id: 'health', label: 'Health', icon: 'favorite' },
+  { id: 'profile', label: 'Profile', icon: 'person' },
 ];
 
 export default function BottomNav({ active, onTabChange }: BottomNavProps) {
   return (
-    <nav className="bottom-nav">
-      {tabs.map(({ id, label, icon: Icon }) => (
-        <button
-          key={id}
-          className={`nav-item ${active === id ? 'active' : ''}`}
-          onClick={() => onTabChange(id)}
-        >
-          <Icon size={22} />
-          <span className="nav-label">{label}</span>
-          {active === id && <div className="nav-indicator" />}
-        </button>
-      ))}
+    <nav className="fixed bottom-0 w-full z-50 bg-surface dark:bg-inverse-surface border-t border-outline-variant dark:border-[#434655] flex justify-around items-center px-lg py-sm">
+      {tabs.map(({ id, label }) => {
+        const isActive = active === id;
+        return (
+          <button
+            key={id}
+            className={`flex flex-col items-center justify-center px-md py-xs transition-all duration-150 active:scale-90 ${
+              isActive
+                ? 'bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl'
+                : 'text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1e3a5f] rounded-xl'
+            }`}
+            onClick={() => onTabChange(id)}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
+              {id === 'home' ? 'home' : id === 'activities' ? 'fitness_center' : id === 'health' ? 'favorite' : 'person'}
+            </span>
+            <span className="font-label-sm text-label-sm">{label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }
