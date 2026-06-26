@@ -17,7 +17,10 @@ export default function ProfileView({ userName, isDark, onToggleDark }: ProfileV
           <div className="w-32 h-32 rounded-full border-4 border-white dark:border-[#1a2a42] shadow-lg overflow-hidden bg-primary-fixed dark:bg-primary/40 flex items-center justify-center">
             <span className="text-5xl font-bold text-on-primary-fixed dark:text-primary-fixed-dim">{userName.charAt(0).toUpperCase()}</span>
           </div>
-          <button className="absolute bottom-0 right-0 bg-primary dark:bg-primary-fixed-dim p-xs rounded-full text-white dark:text-on-primary-fixed shadow-md active:scale-95 transition-transform">
+          <button 
+            className="absolute bottom-0 right-0 bg-primary dark:bg-primary-fixed-dim p-xs rounded-full text-white dark:text-on-primary-fixed shadow-md active:scale-95 transition-transform"
+            onClick={() => alert('Edit profile picture')}
+          >
             <span className="material-symbols-outlined text-sm">edit</span>
           </button>
         </div>
@@ -150,10 +153,16 @@ export default function ProfileView({ userName, isDark, onToggleDark }: ProfileV
 
         {/* Account Actions */}
         <section className="md:col-span-12 flex flex-col md:flex-row gap-md justify-end mt-lg">
-          <button className="bg-secondary-container dark:bg-[#2a3a52] text-on-secondary-container dark:text-secondary-fixed-dim px-xl py-md rounded-xl font-label-md hover:bg-outline-variant dark:hover:bg-[#3a4a62] transition-colors active:scale-95">
+          <button 
+            className="bg-secondary-container dark:bg-[#2a3a52] text-on-secondary-container dark:text-secondary-fixed-dim px-xl py-md rounded-xl font-label-md hover:bg-outline-variant dark:hover:bg-[#3a4a62] transition-colors active:scale-95"
+            onClick={() => alert('Data cache cleared successfully.')}
+          >
             Clear Data Cache
           </button>
-          <button className="bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed px-xl py-md rounded-xl font-label-md hover:bg-primary-container dark:hover:bg-primary transition-colors active:scale-95 flex items-center justify-center gap-sm">
+          <button 
+            className="bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed px-xl py-md rounded-xl font-label-md hover:bg-primary-container dark:hover:bg-primary transition-colors active:scale-95 flex items-center justify-center gap-sm"
+            onClick={() => alert('Signing out...')}
+          >
             <span className="material-symbols-outlined">logout</span>
             Sign Out
           </button>

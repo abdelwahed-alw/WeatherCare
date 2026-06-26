@@ -151,7 +151,10 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
             >
               <span className="material-symbols-outlined">directions_walk</span> Start
             </button>
-            <button className="px-md py-md bg-surface-container-high dark:bg-[#1e3a5f] text-primary dark:text-primary-fixed-dim rounded-xl active:scale-95 transition-transform">
+            <button 
+              className="px-md py-md bg-surface-container-high dark:bg-[#1e3a5f] text-primary dark:text-primary-fixed-dim rounded-xl active:scale-95 transition-transform"
+              onClick={() => alert('Hydration history will be shown here.')}
+            >
               <span className="material-symbols-outlined">history</span>
             </button>
           </div>
@@ -169,7 +172,12 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
         <div className="md:col-span-12">
           <div className="flex items-center justify-between mb-md">
             <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Start Activity</h3>
-            <button className="text-primary dark:text-primary-fixed-dim font-label-md hover:underline">View All</button>
+            <button 
+              className="text-primary dark:text-primary-fixed-dim font-label-md hover:underline"
+              onClick={() => alert('All activities view will be opened.')}
+            >
+              View All
+            </button>
           </div>
           <div className="flex gap-md overflow-x-auto pb-sm hide-scrollbar">
             {allActivities.map((act) => {

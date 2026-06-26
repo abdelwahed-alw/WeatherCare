@@ -100,7 +100,10 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
               </div>
             </div>
           </div>
-          <button className="mt-xl w-full py-md bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed font-label-md text-label-md rounded-full hover:bg-on-primary-fixed-variant dark:hover:bg-primary transition-colors active:scale-95 duration-200">
+          <button 
+            className="mt-xl w-full py-md bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed font-label-md text-label-md rounded-full hover:bg-on-primary-fixed-variant dark:hover:bg-primary transition-colors active:scale-95 duration-200"
+            onClick={() => alert('Full clothing suggestions would open here.')}
+          >
             See Full Suggestions
           </button>
         </div>
@@ -115,7 +118,12 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
               <CalendarIcon className="text-primary dark:text-primary-fixed-dim" />
               <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">7-Day Forecast</h3>
             </div>
-            <button className="text-primary dark:text-primary-fixed-dim font-label-md text-label-md hover:underline">Full Details</button>
+            <button 
+              className="text-primary dark:text-primary-fixed-dim font-label-md text-label-md hover:underline"
+              onClick={() => alert('Full 7-day details would open here.')}
+            >
+              Full Details
+            </button>
           </div>
           <div className="space-y-sm">
             {forecast.map((day, i) => {

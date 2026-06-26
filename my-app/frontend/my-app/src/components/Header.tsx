@@ -32,7 +32,10 @@ export default function Header({ city, onCityChange }: HeaderProps) {
         <h1 className="text-headline-md font-bold text-primary dark:text-primary-fixed-dim">{city.name}</h1>
       </div>
 
-      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed dark:border-primary hover:scale-105 transition-transform cursor-pointer bg-primary-container dark:bg-primary flex items-center justify-center text-on-primary font-bold">
+      <div 
+        className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed dark:border-primary hover:scale-105 transition-transform cursor-pointer bg-primary-container dark:bg-primary flex items-center justify-center text-on-primary font-bold"
+        onClick={() => alert('Profile options would open here.')}
+      >
         {city.name.charAt(0).toUpperCase()}
       </div>
 

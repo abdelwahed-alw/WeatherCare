@@ -61,7 +61,10 @@ export default function DesktopSidebar({ active, onTabChange, city, onCityChange
             <span>{label}</span>
           </button>
         ))}
-        <button className="w-full flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1a2a42] transition-all text-left">
+        <button 
+          className="w-full flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1a2a42] transition-all text-left"
+          onClick={() => alert('Settings menu will open here.')}
+        >
           <span className="material-symbols-outlined">settings</span>
           <span>Settings</span>
         </button>
