@@ -19,6 +19,8 @@ import { useLocalizedData } from '../i18n/useLocalizedData';
 interface HealthViewProps {
   weather: WeatherData;
   recommendations: Recommendations;
+  consumed: number;
+  addWater: (amount: number) => void;
 }
 
 function getUVLevel(uv: number): { label: string; color: string; percent: number } {
@@ -29,12 +31,11 @@ function getUVLevel(uv: number): { label: string; color: string; percent: number
   return { label: 'Low', color: 'bg-green-500', percent: 25 };
 }
 
-export default function HealthView({ weather, recommendations }: HealthViewProps) {
+export default function HealthView({ weather, recommendations, consumed, addWater }: HealthViewProps) {
   const { healthPage } = useLocalizedData();
   const uv = weather.uvIndex;
   const uvLevel = getUVLevel(uv);
   const isExtreme = uv >= 8;
-  const [consumed, setConsumed] = useState(0);
   const [timerRemaining, setTimerRemaining] = useState(0);
   const [allergyDetail, setAllergyDetail] = useState<{ title: string; level: string } | null>(null);
   const [routineDetail, setRoutineDetail] = useState<{ title: string; description: string } | null>(null);
@@ -46,10 +47,6 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
   const circumference = 2 * Math.PI * 88;
   const hydProgress = goal > 0 ? Math.min(currentHydration / goal, 1) : 0;
   const hydOffset = circumference - (hydProgress * circumference);
-
-  const addWater = (amount: number) => {
-    setConsumed(prev => Math.min(prev + amount, goal));
-  };
 
   const reapplySeconds = uv >= 8 ? 900 : uv >= 6 ? 1800 : uv >= 3 ? 3600 : 7200;
 

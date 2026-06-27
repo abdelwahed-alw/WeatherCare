@@ -62,6 +62,11 @@ function App() {
   });
   const [authError, setAuthError] = useState('');
   const [retryCount, setRetryCount] = useState(0);
+  const [consumed, setConsumed] = useState(0);
+  const addWater = (amount: number) => {
+    const goal = fetchState.recommendations?.hydration.liters || 0;
+    setConsumed(prev => Math.min(prev + amount, goal));
+  };
   const [fetchState, dispatch] = useReducer(fetchReducer, {
     loading: true,
     error: null,
@@ -216,6 +221,8 @@ function App() {
                 weather={fetchState.weather}
                 recommendations={fetchState.recommendations}
                 cityName={city.name}
+                activity={activity}
+                onActivityChange={handleActivityChange}
               />
             )}
 
@@ -225,6 +232,8 @@ function App() {
                 recommendations={fetchState.recommendations}
                 activity={activity}
                 onActivityChange={handleActivityChange}
+                consumed={consumed}
+                addWater={addWater}
               />
             )}
 
@@ -232,6 +241,8 @@ function App() {
               <HealthView
                 weather={fetchState.weather}
                 recommendations={fetchState.recommendations}
+                consumed={consumed}
+                addWater={addWater}
               />
             )}
 

@@ -346,12 +346,73 @@ app.get('/api/weather/recommendations', (req, res) => {
   res.json({ city: city.name, weather, recommendations });
 });
 
+// ─── Weather Scene Images ────────────────────────────────────────────
+const weatherImages = {
+  sunny: [
+    { url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80', label: 'Clear skies and golden sunshine' },
+    { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80', label: 'Bright day with warm sunlight' },
+    { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80', label: 'Perfect beach weather ahead' },
+  ],
+  'partly-cloudy': [
+    { url: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80', label: 'Clouds drifting across a blue sky' },
+    { url: 'https://images.unsplash.com/photo-1534088568595-a33ab4c2f494?w=800&q=80', label: 'Soft cloud cover with breaks of sun' },
+  ],
+  cloudy: [
+    { url: 'https://images.unsplash.com/photo-1530908295418-a12e126966a4?w=800&q=80', label: 'Overcast sky with diffused light' },
+    { url: 'https://images.unsplash.com/photo-1499346036226-38c6b92d9b5f?w=800&q=80', label: 'Cloudy day with calm atmosphere' },
+  ],
+  windy: [
+    { url: 'https://images.unsplash.com/photo-1536241397839-b1e34dd9d4b0?w=800&q=80', label: 'Wind sweeping through the landscape' },
+    { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80', label: 'Breezy conditions with moving clouds' },
+  ],
+  default: [
+    { url: 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=800&q=80', label: 'A calm weather day' },
+  ],
+};
+
+// GET /api/weather/image?condition=sunny&activity=walk
+app.get('/api/weather/image', (req, res) => {
+  const { condition, activity } = req.query;
+  const images = weatherImages[condition] || weatherImages.default;
+  const img = images[Math.floor(Math.random() * images.length)];
+  res.json({ ...img, condition: condition || 'unknown', activity: activity || 'walk' });
+});
+
 // ─── Health check ─────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ─── Error Handler ───────────────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// ─── Seed Demo User ─────────────────────────────────────────────────
+(function seedDemoUser() {
+  const email = 'demo@aura.com';
+  if (users.find(u => u.email === email)) return;
+  const user = {
+    id: users.length + 1,
+    name: 'Demo User',
+    email,
+    passwordHash: hashPassword('password123'),
+    preferences: ['daily', 'allergy'],
+    createdAt: new Date().toISOString(),
+  };
+  users.push(user);
+  console.log('🌱 Demo user seeded: demo@aura.com / password123');
+})();
+
 // ─── Start ────────────────────────────────────────────────────────────
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`✅ Marrakech WeatherCare API running on http://localhost:${port}`);
+});
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use`);
+    process.exit(1);
+  }
+  console.error('❌ Server error:', err);
 });

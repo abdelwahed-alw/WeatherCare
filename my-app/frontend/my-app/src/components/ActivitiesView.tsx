@@ -21,6 +21,8 @@ interface ActivitiesViewProps {
   recommendations: Recommendations;
   activity: ActivityType;
   onActivityChange: (a: ActivityType) => void;
+  consumed: number;
+  addWater: (amount: number) => void;
 }
 
 interface ActivityOption {
@@ -40,12 +42,11 @@ function estimateTempAtHour(currentTemp: number, hour: number): number {
   return Math.round(peakTemp - ratio * tempRange);
 }
 
-export default function ActivitiesView({ weather, recommendations, activity, onActivityChange }: ActivitiesViewProps) {
+export default function ActivitiesView({ weather, recommendations, activity, onActivityChange, consumed, addWater }: ActivitiesViewProps) {
   const { activitiesPage } = useLocalizedData();
   const allActivities: ActivityOption[] = activitiesPage.activities;
   const temp = weather.temperature;
   const conditionLabel = weather.condition.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-  const [consumed, setConsumed] = useState(0);
   const [fabClicked, setFabClicked] = useState(false);
   const [hydrationHistory, setHydrationHistory] = useState(false);
   const [insightModal, setInsightModal] = useState<{ type: string; title: string; description: string } | null>(null);
@@ -63,10 +64,6 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
   const currentHydration = Math.min(consumed, goal);
   const progress = goal > 0 ? currentHydration / goal : 0;
   const offset = circumference - (progress * circumference);
-
-  const addWater = (amount: number) => {
-    setConsumed(prev => Math.min(prev + amount, goal));
-  };
 
   const toActivityType = (id: string): ActivityType => {
     if (id === 'run') return 'run';

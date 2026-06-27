@@ -23,6 +23,7 @@ interface HomeViewProps {
   recommendations: Recommendations;
   cityName: string;
   activity?: ActivityType;
+  onActivityChange?: (a: ActivityType) => void;
 }
 
 function getWeatherIcon(condition: string): { icon: string; color: string } {
@@ -35,7 +36,7 @@ function getWeatherIcon(condition: string): { icon: string; color: string } {
   }
 }
 
-export default function HomeView({ weather, recommendations, cityName, activity = 'walk' }: HomeViewProps) {
+export default function HomeView({ weather, recommendations, cityName, activity = 'walk', onActivityChange }: HomeViewProps) {
   const { homePage } = useLocalizedData();
   const formatDayLabel = (day: string, index: number): string => {
     if (index === 0) return homePage.forecast.tomorrow;
@@ -60,14 +61,29 @@ export default function HomeView({ weather, recommendations, cityName, activity 
   }, [condition, activity]);
 
   function getActivityLabel(): string {
-    if (temperature >= 38) return 'Extreme Heat • Stay indoors and hydrate';
-    if (temperature >= 35) return 'Very Hot • Limit outdoor activity';
-    if (temperature >= 30) { if (activity === 'run') return 'Hot • Running not recommended'; if (activity === 'work') return 'Hot • Take frequent breaks'; return 'Hot • Light activity only'; }
-    if (temperature >= 25) { if (activity === 'run') return 'Warm • Run early or at dusk'; if (activity === 'work') return 'Warm • Stay hydrated'; return 'Warm • Great for a walk'; }
-    if (temperature >= 18) { if (activity === 'run') return 'Pleasant • Perfect running weather'; if (activity === 'work') return 'Pleasant • Comfortable conditions'; return 'Pleasant • Ideal for outdoor yoga'; }
-    if (temperature >= 12) { if (activity === 'run') return 'Cool • Layer up before your run'; if (activity === 'work') return 'Cool • Wear a light jacket'; return 'Cool • A light layer recommended'; }
-    if (temperature >= 6) return 'Cold • Bundle up well';
-    return 'Very Cold • Limit time outdoors';
+    const labelMap: Record<string, string> = { walk: 'Walking', run: 'Running', work: 'Cycling' };
+    const actName = labelMap[activity] || 'Walking';
+    const { badge } = getActivityBadge(actName);
+
+    const tempPhrase = (): string => {
+      if (temperature >= 38) return 'Extreme Heat';
+      if (temperature >= 35) return 'Very Hot';
+      if (temperature >= 30) return 'Hot';
+      if (temperature >= 25) return 'Warm';
+      if (temperature >= 18) return 'Pleasant';
+      if (temperature >= 12) return 'Cool';
+      if (temperature >= 6) return 'Cold';
+      return 'Very Cold';
+    };
+
+    const advice: Record<string, string> = {
+      EXCELLENT: `Perfect for ${actName.toLowerCase()}`,
+      GOOD: `Good for ${actName.toLowerCase()}`,
+      MODERATE: `OK for ${actName.toLowerCase()}`,
+      POOR: `Avoid ${actName.toLowerCase()}`,
+    };
+
+    return `${tempPhrase()} • ${advice[badge] || advice.EXCELLENT}`;
   }
 
   function getConditionBadge(): string {
@@ -354,7 +370,14 @@ export default function HomeView({ weather, recommendations, cityName, activity 
                     ? 'border-primary dark:border-primary-fixed-dim ring-2 ring-primary dark:ring-primary-fixed-dim'
                     : 'hover:border-primary dark:hover:border-primary-fixed-dim'
                 }`}
-                onClick={() => setSelectedActivity(isSelected ? null : card.label)}
+                onClick={() => {
+                  const newVal = isSelected ? null : card.label;
+                  setSelectedActivity(newVal);
+                  if (newVal) {
+                    const typeMap: Record<string, ActivityType> = { Walking: 'walk', Running: 'run', Cycling: 'work' };
+                    onActivityChange?.(typeMap[newVal] || 'walk');
+                  }
+                }}
                 aria-pressed={isSelected}
                 aria-label={`${card.label}: ${rating.badge}`}
               >
