@@ -177,7 +177,7 @@ export const profilePage = {
 };
 
 export const common = {
-  appName: 'Aura Weather & Wellness',
+  appName: 'WeatherCare',
   profileEdit: 'Edit profile picture',
   fullDetails: 'Full Details',
   settings: 'Settings',

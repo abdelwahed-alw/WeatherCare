@@ -136,14 +136,14 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
               <button
-                className="flex gap-sm p-md bg-surface-container dark:bg-[#0b1c30] rounded-md hover:bg-surface-container-high dark:hover:bg-[#1a2a42] transition-colors text-left focus-ring"
+                className="flex gap-sm p-md bg-surface-container dark:bg-[#0b1c30] rounded-md hover:bg-surface-container-high dark:hover:bg-[#1a2a42] transition-colors text-start focus-ring"
                 onClick={() => setUvTipDetail({ tip: uvSafeTip })}
               >
                 <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">check_circle</span>
                 <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">{uvSafeTip}</p>
               </button>
               <button
-                className="flex gap-sm p-md bg-surface-container dark:bg-[#0b1c30] rounded-md hover:bg-surface-container-high dark:hover:bg-[#1a2a42] transition-colors text-left focus-ring"
+                className="flex gap-sm p-md bg-surface-container dark:bg-[#0b1c30] rounded-md hover:bg-surface-container-high dark:hover:bg-[#1a2a42] transition-colors text-start focus-ring"
                 onClick={() => setUvTipDetail({ tip: uvProtectionTip })}
               >
                 <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">umbrella</span>
@@ -228,7 +228,7 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
 
         {/* Allergy Alert */}
         <div className="md:col-span-6 bg-surface-container-lowest dark:bg-[#1a2a42] rounded-lg p-lg card-shadow border border-outline-variant dark:border-[#2a3a52] overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-lg opacity-10" aria-hidden="true">
+          <div className="absolute top-0 end-0 p-lg opacity-10" aria-hidden="true">
             <span className="material-symbols-outlined text-[120px]" style={{ fontSize: '120px' }}>grass</span>
           </div>
           <div className="relative z-10">
@@ -245,7 +245,7 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
                     : healthPage.allergyAlert.lowRisk}
                 </h3>
               </div>
-              <div className="flex -space-x-2">
+              <div className="flex -space-x-2 rtl:space-x-reverse">
                 <span className="w-12 h-12 rounded-full bg-secondary-fixed dark:bg-[#2a3a52] flex items-center justify-center border-4 border-surface-container-lowest dark:border-[#1a2a42]">
                   <span className="material-symbols-outlined text-sm text-on-surface dark:text-inverse-on-surface">spa</span>
                 </span>
@@ -256,7 +256,7 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
             </div>
             <div className="space-y-sm">
               <button
-                className="flex justify-between items-center w-full py-sm border-b border-outline-variant dark:border-[#2a3a52] hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-left focus-ring"
+                className="flex justify-between items-center w-full py-sm border-b border-outline-variant dark:border-[#2a3a52] hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-start focus-ring"
                 onClick={() => setAllergyDetail({ title: healthPage.allergyAlert.grassPollen, level: weather.pollenLevel === 'high' ? 'High' : weather.pollenLevel === 'moderate' ? 'Moderate' : 'Low' })}
               >
                 <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">{healthPage.allergyAlert.grassPollen}</span>
@@ -267,14 +267,14 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
                 </span>
               </button>
               <button
-                className="flex justify-between items-center w-full py-sm border-b border-outline-variant dark:border-[#2a3a52] hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-left focus-ring"
+                className="flex justify-between items-center w-full py-sm border-b border-outline-variant dark:border-[#2a3a52] hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-start focus-ring"
                 onClick={() => setAllergyDetail({ title: healthPage.allergyAlert.treePollen, level: 'Low' })}
               >
                 <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">{healthPage.allergyAlert.treePollen}</span>
                 <span className="font-label-md px-sm py-xs bg-surface-container dark:bg-[#0b1c30] text-tertiary dark:text-tertiary-fixed-dim rounded-full">Low</span>
               </button>
               <button
-                className="flex justify-between items-center w-full py-sm hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-left focus-ring"
+                className="flex justify-between items-center w-full py-sm hover:bg-surface-container-low dark:hover:bg-[#0b1c30] px-sm rounded transition-colors text-start focus-ring"
                 onClick={() => setAllergyDetail({ title: healthPage.allergyAlert.dustMold, level: weather.dustLevel === 'high' ? 'High' : weather.dustLevel === 'moderate' ? 'Moderate' : 'Low' })}
               >
                 <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">{healthPage.allergyAlert.dustMold}</span>
@@ -296,7 +296,7 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
           </div>
           <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-md">
             <button
-              className="p-md bg-white dark:bg-[#1a2a42] rounded-lg flex gap-md items-start hover:shadow-md transition-shadow text-left focus-ring"
+              className="p-md bg-white dark:bg-[#1a2a42] rounded-lg flex gap-md items-start hover:shadow-md transition-shadow text-start focus-ring"
               onClick={() => setRoutineDetail({
                 title: healthPage.wellnessRoutine.eyeProtection,
                 description: weather.uvIndex >= 6
@@ -317,7 +317,7 @@ export default function HealthView({ weather, recommendations }: HealthViewProps
               </div>
             </button>
             <button
-              className="p-md bg-white dark:bg-[#1a2a42] rounded-lg flex gap-md items-start hover:shadow-md transition-shadow text-left focus-ring"
+              className="p-md bg-white dark:bg-[#1a2a42] rounded-lg flex gap-md items-start hover:shadow-md transition-shadow text-start focus-ring"
               onClick={() => setRoutineDetail({
                 title: healthPage.wellnessRoutine.airQuality,
                 description: weather.airQuality

@@ -8,7 +8,7 @@ interface AllergyCardProps {
 export default function AllergyCard({ alert }: AllergyCardProps) {
   if (!alert.hasAlert) {
     return (
-      <div className="aura-card p-lg animate-in">
+      <div className="wc-card p-lg animate-in">
         <div className="flex items-center gap-sm mb-sm">
           <AirIcon size={22} className="text-primary" />
           <h3 className="font-headline-md text-headline-md">Allergy & Health</h3>
@@ -19,7 +19,7 @@ export default function AllergyCard({ alert }: AllergyCardProps) {
   }
 
   return (
-    <div className={`aura-card p-lg animate-in ${alert.severity === 'high' ? 'border-error-container bg-error-container/10' : ''}`}>
+    <div className={`wc-card p-lg animate-in ${alert.severity === 'high' ? 'border-error-container bg-error-container/10' : ''}`}>
       <div className="flex items-center gap-sm mb-sm">
         <AirIcon size={22} className={alert.severity === 'high' ? 'text-error' : 'text-primary'} />
         <h3 className="font-headline-md text-headline-md">Allergy Alert</h3>

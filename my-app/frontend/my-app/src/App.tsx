@@ -27,7 +27,7 @@ type FetchAction =
 function fetchReducer(state: FetchState, action: FetchAction): FetchState {
   switch (action.type) {
     case 'FETCH_START':
-      return { ...state, loading: true, error: null };
+      return { ...state, loading: true, error: null, weather: state.weather, recommendations: state.recommendations };
     case 'FETCH_SUCCESS':
       return { ...state, loading: false, weather: action.weather, recommendations: action.recommendations, error: null };
     case 'FETCH_ERROR':
@@ -199,7 +199,7 @@ function App() {
           </div>
         )}
 
-        {fetchState.loading && !fetchState.error && (
+        {fetchState.loading && !fetchState.weather && !fetchState.error && (
           <div className="loading-state" aria-live="polite" role="status">
             <span className="sr-only">Loading weather data...</span>
             <div className="skeleton skeleton-weather" aria-hidden="true" />
@@ -209,7 +209,7 @@ function App() {
           </div>
         )}
 
-        {!fetchState.loading && !fetchState.error && fetchState.weather && fetchState.recommendations && (
+        {!fetchState.error && fetchState.weather && fetchState.recommendations && (
           <>
             {activeTab === 'home' && (
               <HomeView

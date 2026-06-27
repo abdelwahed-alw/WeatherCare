@@ -131,7 +131,7 @@ export default function RecommendationCards({ recommendations, activity, onActiv
     <div className="animate-in">
       <div className="flex gap-lg overflow-x-auto snap-x snap-mandatory pb-sm" ref={scrollRef} style={{ scrollbarWidth: 'none' }}>
         {cards.map((card) => (
-          <div key={card.id} className="flex-[0_0_100%] snap-start aura-card p-lg">
+          <div key={card.id} className="flex-[0_0_100%] snap-start wc-card p-lg">
             <h3 className="font-headline-md text-headline-md flex items-center gap-sm mb-md">
               <card.icon className="text-primary" />
               {card.title}

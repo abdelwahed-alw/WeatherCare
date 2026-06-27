@@ -65,7 +65,7 @@ export default function DesktopSidebar({ active, onTabChange, city, onCityChange
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            className={`w-full flex items-center gap-md px-md py-sm rounded-xl transition-all text-left ${
+            className={`w-full flex items-center gap-md px-md py-sm rounded-xl transition-all text-start ${
               active === id
                 ? 'bg-primary-container dark:bg-primary/40 text-on-primary-container dark:text-inverse-on-surface font-semibold'
                 : 'text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1a2a42]'
@@ -77,7 +77,7 @@ export default function DesktopSidebar({ active, onTabChange, city, onCityChange
           </button>
         ))}
         <button
-          className="w-full flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1a2a42] transition-all text-left"
+          className="w-full flex items-center gap-md px-md py-sm rounded-xl text-on-surface-variant dark:text-secondary-fixed-dim hover:bg-surface-container-low dark:hover:bg-[#1a2a42] transition-all text-start"
           onClick={() => setShowSettings(!showSettings)}
         >
           <span className="material-symbols-outlined">settings</span>
@@ -106,15 +106,15 @@ export default function DesktopSidebar({ active, onTabChange, city, onCityChange
               </button>
             </div>
             <div className="space-y-md">
-              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-left focus-ring">
+              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-start focus-ring">
                 <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">notifications</span>
                 <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface">Notification Settings</span>
               </button>
-              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-left focus-ring">
+              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-start focus-ring">
                 <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">palette</span>
                 <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface">Theme Customization</span>
               </button>
-              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-left focus-ring">
+              <button className="w-full flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container/50 transition-colors text-start focus-ring">
                 <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">info</span>
                 <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface">About & Privacy</span>
               </button>

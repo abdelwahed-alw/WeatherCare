@@ -1,6 +1,6 @@
 export const translations = {
   en: {
-    app: { name: 'Aura', tagline: 'Weather & Wellness' },
+    app: { name: 'WeatherCare', tagline: 'Weather & Wellness' },
     nav: { home: 'Home', activities: 'Activities', health: 'Health', profile: 'Profile' },
     settings: 'Settings',
     search: { placeholder: 'Search Moroccan cities\u2026', label: 'Search Moroccan cities' },
@@ -40,7 +40,7 @@ export const translations = {
       title: 'Welcome back',
       subtitle: 'Step into your morning clarity.',
       emailLabel: 'Email address',
-      emailPlaceholder: 'yourname@aura.com',
+      emailPlaceholder: 'yourname@weathercare.app',
       passwordLabel: 'Password',
       passwordPlaceholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
       forgotPassword: 'Forgot Password?',
@@ -54,11 +54,11 @@ export const translations = {
       privacy: 'Privacy Policy',
       terms: 'Terms of Service',
     },
-    common: { footer: 'Aura — Smart weather & wellness recommendations.', settings: 'Settings', notification: 'Notification Settings', theme: 'Theme Customization', about: 'About & Privacy' },
+    common: { footer: 'WeatherCare — Smart weather & wellness recommendations.', settings: 'Settings', notification: 'Notification Settings', theme: 'Theme Customization', about: 'About & Privacy' },
   },
 
   fr: {
-    app: { name: 'Aura', tagline: 'Météo & Bien-être' },
+    app: { name: 'WeatherCare', tagline: 'Météo & Bien-être' },
     nav: { home: 'Accueil', activities: 'Activités', health: 'Santé', profile: 'Profil' },
     settings: 'Paramètres',
     search: { placeholder: 'Rechercher des villes marocaines\u2026', label: 'Rechercher des villes marocaines' },
@@ -98,7 +98,7 @@ export const translations = {
       title: 'Bon retour',
       subtitle: 'Entrez dans votre clarté matinale.',
       emailLabel: 'Adresse e-mail',
-      emailPlaceholder: 'votrenom@aura.com',
+      emailPlaceholder: 'votrenom@weathercare.app',
       passwordLabel: 'Mot de passe',
       passwordPlaceholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
       forgotPassword: 'Mot de passe oublié ?',
@@ -112,11 +112,11 @@ export const translations = {
       privacy: 'Politique de confidentialité',
       terms: "Conditions d'utilisation",
     },
-    common: { footer: 'Aura — Recommandations météo & bien-être intelligentes.', settings: 'Paramètres', notification: 'Paramètres de Notification', theme: 'Personnalisation du Thème', about: 'À Propos & Confidentialité' },
+    common: { footer: 'WeatherCare — Recommandations météo & bien-être intelligentes.', settings: 'Paramètres', notification: 'Paramètres de Notification', theme: 'Personnalisation du Thème', about: 'À Propos & Confidentialité' },
   },
 
   ar: {
-    app: { name: 'أورا', tagline: 'الطقس والعافية' },
+    app: { name: 'WeatherCare', tagline: 'الطقس والعافية' },
     nav: { home: 'الرئيسية', activities: 'الأنشطة', health: 'الصحة', profile: 'الملف' },
     settings: 'الإعدادات',
     search: { placeholder: 'البحث عن المدن المغربية\u2026', label: 'البحث عن المدن المغربية' },
@@ -156,7 +156,7 @@ export const translations = {
       title: 'مرحباً بعودتك',
       subtitle: 'ادخل إلى صفاء صباحك.',
       emailLabel: 'البريد الإلكتروني',
-      emailPlaceholder: 'yourname@aura.com',
+      emailPlaceholder: 'yourname@weathercare.app',
       passwordLabel: 'كلمة المرور',
       passwordPlaceholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
       forgotPassword: 'نسيت كلمة المرور؟',
@@ -170,7 +170,7 @@ export const translations = {
       privacy: 'سياسة الخصوصية',
       terms: 'شروط الخدمة',
     },
-    common: { footer: 'أورا — توصيات ذكية للطقس والعافية.', settings: 'الإعدادات', notification: 'إعدادات الإشعارات', theme: 'تخصيص السمة', about: 'حول والخصوصية' },
+    common: { footer: 'WeatherCare — توصيات ذكية للطقس والعافية.', settings: 'الإعدادات', notification: 'إعدادات الإشعارات', theme: 'تخصيص السمة', about: 'حول والخصوصية' },
   },
 };
 

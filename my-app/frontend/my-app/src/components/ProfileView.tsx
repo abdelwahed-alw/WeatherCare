@@ -53,7 +53,15 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES.find(l => l.code === locale) || LANGUAGES[0]);
   const [cacheCleared, setCacheCleared] = useState(false);
+  const [citySearch, setCitySearch] = useState('');
   const prefTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const filteredCities = citySearch
+    ? moroccanCities.filter(c =>
+        c.name.toLowerCase().includes(citySearch.toLowerCase()) ||
+        c.region.toLowerCase().includes(citySearch.toLowerCase())
+      )
+    : moroccanCities;
 
   useEffect(() => {
     setSelectedLanguage(LANGUAGES.find(l => l.code === locale) || LANGUAGES[0]);
@@ -87,14 +95,14 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
             <span className="text-5xl font-bold text-on-primary-fixed dark:text-primary-fixed-dim">{userName.charAt(0).toUpperCase()}</span>
           </div>
           <button
-            className="absolute bottom-0 right-0 bg-primary dark:bg-primary-fixed-dim p-xs rounded-full text-white dark:text-on-primary-fixed shadow-md active:scale-95 transition-transform focus-ring"
+            className="absolute bottom-0 end-0 bg-primary dark:bg-primary-fixed-dim p-xs rounded-full text-white dark:text-on-primary-fixed shadow-md active:scale-95 transition-transform focus-ring"
             onClick={() => alert('Edit profile picture')}
             aria-label="Edit profile picture"
           >
             <span className="material-symbols-outlined text-sm" aria-hidden="true">edit</span>
           </button>
         </div>
-        <div className="text-center md:text-left">
+        <div className="text-center md:text-start">
           <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface">{userName}</h2>
           <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
             {profilePage.wellnessScore}: 84 • {profilePage.premiumMember}
@@ -126,13 +134,13 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
                   checked={isDark}
                   onChange={onToggleDark}
                 />
-                <div className="w-12 h-6 bg-secondary-container dark:bg-[#2a3a52] rounded-full peer peer-checked:bg-primary dark:peer-checked:bg-primary-fixed-dim after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6" />
+                <div className="w-12 h-6 bg-secondary-container dark:bg-[#2a3a52] rounded-full peer peer-checked:bg-primary dark:peer-checked:bg-primary-fixed-dim after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-6 rtl:peer-checked:after:-translate-x-6" />
               </label>
             </div>
 
             {/* Default City */}
             <button
-              className="flex items-center justify-between group w-full text-left focus-ring rounded-lg"
+              className="flex items-center justify-between group w-full text-start focus-ring rounded-lg"
               onClick={() => setShowCityPicker(true)}
               aria-label={`${profilePage.preferences.defaultCity}: ${city.name}`}
             >
@@ -147,13 +155,13 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
               </div>
               <div className="flex items-center gap-xs text-primary dark:text-primary-fixed-dim font-label-md">
                 <span>{city.name}, Morocco</span>
-                <span className="material-symbols-outlined text-sm" aria-hidden="true">chevron_right</span>
+                <span className="material-symbols-outlined text-sm no-flip" aria-hidden="true">chevron_right</span>
               </div>
             </button>
 
             {/* Language */}
             <button
-              className="flex items-center justify-between group w-full text-left focus-ring rounded-lg"
+              className="flex items-center justify-between group w-full text-start focus-ring rounded-lg"
               onClick={() => setShowLanguagePicker(true)}
               aria-label={`${profilePage.preferences.language}: ${selectedLanguage.label}`}
             >
@@ -168,7 +176,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
               </div>
               <div className="flex items-center gap-xs text-primary dark:text-primary-fixed-dim font-label-md">
                 <span>{selectedLanguage.label}</span>
-                <span className="material-symbols-outlined text-sm" aria-hidden="true">chevron_right</span>
+                <span className="material-symbols-outlined text-sm no-flip" aria-hidden="true">chevron_right</span>
               </div>
             </button>
           </div>
@@ -192,7 +200,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
                   className="w-5 h-5 rounded-full border-secondary-container text-primary focus:ring-primary"
                 />
               </div>
-              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ml-8">{profilePage.notifications.dailyAlertsDesc}</p>
+              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ms-8">{profilePage.notifications.dailyAlertsDesc}</p>
             </div>
 
             {/* Heat Wave */}
@@ -209,7 +217,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
                   className="w-5 h-5 rounded-full border-secondary-container text-primary focus:ring-primary"
                 />
               </div>
-              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ml-8">{profilePage.notifications.heatWaveDesc}</p>
+              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ms-8">{profilePage.notifications.heatWaveDesc}</p>
             </div>
 
             {/* Allergy */}
@@ -226,7 +234,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
                   className="w-5 h-5 rounded-full border-secondary-container text-primary focus:ring-primary"
                 />
               </div>
-              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ml-8">{profilePage.notifications.allergyDesc}</p>
+              <p className="text-xs text-on-surface-variant dark:text-secondary-fixed-dim ms-8">{profilePage.notifications.allergyDesc}</p>
             </div>
           </div>
         </section>
@@ -255,7 +263,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
 
       {/* Cache Cleared Toast */}
       {cacheCleared && (
-        <div className="fixed top-24 right-6 z-50 bg-green-600 text-white px-lg py-md rounded-xl shadow-lg animate-in" role="status" aria-live="polite">
+        <div className="fixed top-24 end-6 z-50 bg-green-600 text-white px-lg py-md rounded-xl shadow-lg animate-in" role="status" aria-live="polite">
           {profilePage.account.cacheCleared}
         </div>
       )}
@@ -263,42 +271,115 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
       {/* City Picker Modal */}
       {showCityPicker && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
-          onClick={() => setShowCityPicker(false)}
-          onKeyDown={(e) => { if (e.key === 'Escape') setShowCityPicker(false); }}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-lg animate-in"
+          onClick={() => { setShowCityPicker(false); setCitySearch(''); }}
+          onKeyDown={(e) => { if (e.key === 'Escape') { setShowCityPicker(false); setCitySearch(''); } }}
           role="presentation"
           style={{ overscrollBehavior: 'contain' }}
         >
-          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={profilePage.preferences.defaultCity}>
-            <div className="flex items-center justify-between mb-lg">
-              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{profilePage.preferences.defaultCity}</h3>
-              <button onClick={() => setShowCityPicker(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label="Close city picker">
-                <MaterialIcon icon="close" size={24} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="space-y-sm">
-              {moroccanCities.map((c) => (
-                <button
-                  key={c.name}
-                  className={`w-full flex items-center justify-between p-md rounded-xl transition-colors text-left focus-ring ${
-                    city.name === c.name
-                      ? 'bg-primary-container dark:bg-primary/30 text-on-primary-container dark:text-inverse-on-surface'
-                      : 'hover:bg-surface-container-low dark:hover:bg-[#0b1c30] text-on-surface dark:text-inverse-on-surface'
-                  }`}
-                  onClick={() => {
-                    onCityChange(c);
-                    setShowCityPicker(false);
-                  }}
-                >
-                  <div>
-                    <span className="font-label-md text-label-md block">{c.name}</span>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">{c.region}</span>
+          <div
+            className="bg-surface dark:bg-[#0f1d30] rounded-3xl p-0 max-w-sm w-full shadow-2xl max-h-[80vh] flex flex-col overflow-hidden border border-outline-variant/20 dark:border-white/5"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={profilePage.preferences.defaultCity}
+          >
+            {/* Header */}
+            <div className="p-xl pb-0">
+              <div className="flex items-center justify-between mb-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style={{ fontSize: '22px', fontVariationSettings: "'FILL' 1" }}>travel_explore</span>
                   </div>
-                  {city.name === c.name && (
-                    <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">check</span>
-                  )}
+                  <div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{profilePage.preferences.defaultCity}</h3>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">{moroccanCities.length} cities available</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setShowCityPicker(false); setCitySearch(''); }}
+                  className="w-9 h-9 rounded-xl hover:bg-surface-container-high dark:hover:bg-white/10 flex items-center justify-center transition-colors focus-ring text-on-surface-variant dark:text-secondary-fixed-dim"
+                  aria-label="Close city picker"
+                >
+                  <MaterialIcon icon="close" size={20} aria-hidden="true" />
                 </button>
-              ))}
+              </div>
+
+              {/* Search */}
+              <div className="relative mb-lg">
+                <span className="absolute start-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 dark:text-secondary-fixed-dim/60">
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>search</span>
+                </span>
+                <input
+                  type="text"
+                  value={citySearch}
+                  onChange={e => setCitySearch(e.target.value)}
+                  placeholder="Search by city or region..."
+                  className="w-full bg-surface-container-high dark:bg-white/5 text-on-surface dark:text-inverse-on-surface rounded-2xl ps-11 pe-10 py-3.5 font-body-md text-body-md outline-none focus:ring-2 focus:ring-primary dark:focus:ring-secondary transition-all placeholder:text-on-surface-variant/40 dark:placeholder:text-secondary-fixed-dim/40 border border-outline-variant/30 dark:border-white/5"
+                />
+                {citySearch && (
+                  <button
+                    onClick={() => setCitySearch('')}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-on-surface-variant dark:text-secondary-fixed-dim/50 dark:hover:text-secondary-fixed-dim"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* City List */}
+            <div className="flex-1 overflow-y-auto px-xl pb-xl custom-scrollbar">
+              {filteredCities.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-2xl">
+                  <div className="w-16 h-16 rounded-2xl bg-surface-container-high dark:bg-white/5 flex items-center justify-center mb-md">
+                    <span className="material-symbols-outlined text-3xl text-on-surface-variant/40 dark:text-secondary-fixed-dim/40">explore_off</span>
+                  </div>
+                  <p className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-xs">No results</p>
+                  <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim text-center">Try a different search term</p>
+                </div>
+              ) : (
+                <div className="space-y-xs">
+                  {filteredCities.map((c, idx) => (
+                    <button
+                      key={c.name}
+                      className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all text-start focus-ring group ${
+                        city.name === c.name
+                          ? 'bg-primary/10 dark:bg-primary/20 ring-1 ring-primary/30 dark:ring-primary/40'
+                          : 'hover:bg-surface-container-high dark:hover:bg-white/5 active:scale-[0.98]'
+                      }`}
+                      style={{ animationDelay: `${idx * 30}ms` }}
+                      onClick={() => {
+                        onCityChange(c);
+                        setShowCityPicker(false);
+                        setCitySearch('');
+                      }}
+                    >
+                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
+                        city.name === c.name
+                          ? 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed shadow-lg shadow-primary/30 dark:shadow-primary/20'
+                          : 'bg-surface-container-high dark:bg-white/5 text-primary dark:text-primary-fixed-dim group-hover:scale-110'
+                      }`}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '22px', fontVariationSettings: city.name === c.name ? "'FILL' 1" : "'FILL' 0" }}>location_on</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-label-md text-label-md block truncate text-on-surface dark:text-inverse-on-surface font-medium">{c.name}</span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50 dark:text-secondary-fixed-dim/50">pin_drop</span>
+                          <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim truncate">{c.region}</span>
+                        </div>
+                      </div>
+                      {city.name === c.name ? (
+                        <div className="w-7 h-7 rounded-full bg-primary dark:bg-primary-fixed-dim flex items-center justify-center flex-shrink-0">
+                          <span className="material-symbols-outlined text-on-primary dark:text-on-primary-fixed" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>check</span>
+                        </div>
+                      ) : (
+                        <span className="material-symbols-outlined text-on-surface-variant/20 dark:text-secondary-fixed-dim/20 group-hover:text-on-surface-variant/40 dark:group-hover:text-secondary-fixed-dim/40 transition-colors flex-shrink-0 no-flip" style={{ fontSize: '20px' }}>chevron_right</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -324,7 +405,7 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
-                  className={`w-full flex items-center justify-between p-md rounded-xl transition-colors text-left focus-ring ${
+                  className={`w-full flex items-center justify-between p-md rounded-xl transition-colors text-start focus-ring ${
                     selectedLanguage.code === lang.code
                       ? 'bg-primary-container dark:bg-primary/30 text-on-primary-container dark:text-inverse-on-surface'
                       : 'hover:bg-surface-container-low dark:hover:bg-[#0b1c30] text-on-surface dark:text-inverse-on-surface'

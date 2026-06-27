@@ -26,9 +26,9 @@ export default function RegisterPreferences({ onComplete, onSkip }: RegisterPref
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background dark:bg-[#051424] overflow-hidden">
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-2xl -left-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
-        <div className="absolute bottom-2xl right-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-2xl -start-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
+        <div className="absolute bottom-2xl end-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
       </div>
 
       <header className="w-full top-0 sticky bg-surface/80 dark:bg-[#051424]/80 backdrop-blur-md z-50">
@@ -82,7 +82,7 @@ export default function RegisterPreferences({ onComplete, onSkip }: RegisterPref
                 }`}
                 onClick={() => toggle(value)}
               >
-                <div className="w-12 h-12 rounded-full bg-surface-container dark:bg-[rgba(255,255,255,0.05)] flex items-center justify-center mr-md">
+                  <div className="w-12 h-12 rounded-full bg-surface-container dark:bg-[rgba(255,255,255,0.05)] flex items-center justify-center me-md">
                   <span className="material-symbols-outlined text-primary dark:text-secondary text-3xl">
                     {icon}
                   </span>

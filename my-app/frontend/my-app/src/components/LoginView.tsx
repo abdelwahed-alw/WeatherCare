@@ -32,9 +32,9 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
   if (showRegister) {
     return (
       <div className="relative min-h-screen flex items-center justify-center p-lg bg-background dark:bg-[#051424] overflow-hidden">
-        <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-          <div className="absolute -top-2xl -left-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
-          <div className="absolute bottom-2xl right-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-2xl -start-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
+          <div className="absolute bottom-2xl end-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
         </div>
 
         <main className="relative z-10 w-full max-w-[440px] flex flex-col gap-lg">
@@ -51,7 +51,7 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
             {error && (
               <div className="mb-md p-md bg-error-container dark:bg-[#93000a]/30 text-on-error-container dark:text-error-container rounded-lg font-body text-body-md flex items-center justify-between">
                 <span>{error}</span>
-                <button type="button" className="ml-sm hover:opacity-70" onClick={onClearError} aria-label="Dismiss error">
+                <button type="button" className="ms-sm hover:opacity-70" onClick={onClearError} aria-label="Dismiss error">
                   <span className="material-symbols-outlined text-[18px]">close</span>
                 </button>
               </div>
@@ -69,8 +69,8 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
               <div>
                 <label className="block font-label-md text-label-md text-on-surface dark:text-on-surface mb-xs px-base" htmlFor="reg-password">Password</label>
                 <div className="relative">
-                  <input id="reg-password" type={showRegisterPassword ? 'text' : 'password'} value={registerPassword} onChange={e => setRegisterPassword(e.target.value)} placeholder="At least 8 characters" className="w-full bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-0 focus:ring-2 focus:ring-primary dark:focus:ring-secondary rounded-md px-md py-md font-body-md text-body-md transition-all outline-none text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40 pr-12" autoComplete="new-password" required minLength={8} />
-                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" onClick={() => setShowRegisterPassword(!showRegisterPassword)} aria-label={showRegisterPassword ? 'Hide password' : 'Show password'}>
+                  <input id="reg-password" type={showRegisterPassword ? 'text' : 'password'} value={registerPassword} onChange={e => setRegisterPassword(e.target.value)} placeholder="At least 8 characters" className="w-full bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-0 focus:ring-2 focus:ring-primary dark:focus:ring-secondary rounded-md px-md py-md font-body-md text-body-md transition-all outline-none text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40 pe-12" autoComplete="new-password" required minLength={8} />
+                  <button type="button" className="absolute end-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors" onClick={() => setShowRegisterPassword(!showRegisterPassword)} aria-label={showRegisterPassword ? 'Hide password' : 'Show password'}>
                     <span className="material-symbols-outlined">{showRegisterPassword ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
@@ -83,7 +83,7 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
 
             <p className="text-center font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant mt-lg">
               Already have an account?
-              <button type="button" className="font-label-md text-label-md text-primary dark:text-secondary hover:underline ml-xs" onClick={() => setShowRegister(false)}>
+              <button type="button" className="font-label-md text-label-md text-primary dark:text-secondary hover:underline ms-xs" onClick={() => setShowRegister(false)}>
                 Sign in
               </button>
             </p>
@@ -95,11 +95,11 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-lg bg-background dark:bg-[#051424] overflow-hidden">
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-2xl -left-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
-        <div className="absolute bottom-2xl right-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
-        <div className="animated-blob hidden dark:block" style={{ top: '-100px', left: '-100px' }} />
-        <div className="animated-blob hidden dark:block" style={{ bottom: '-100px', right: '-100px', animationDelay: '-5s' }} />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-2xl -start-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
+        <div className="absolute bottom-2xl end-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
+        <div className="animated-blob hidden dark:block" style={{ top: '-100px', insetInlineStart: '-100px' }} />
+        <div className="animated-blob hidden dark:block" style={{ bottom: '-100px', insetInlineEnd: '-100px', animationDelay: '-5s' }} />
       </div>
 
       <main className="relative z-10 w-full max-w-[440px] flex flex-col gap-lg">
@@ -128,7 +128,7 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
           {error && (
             <div className="mb-md p-md bg-error-container dark:bg-[#93000a]/30 text-on-error-container dark:text-error-container rounded-lg font-body text-body-md flex items-center justify-between">
               <span>{error}</span>
-              <button type="button" className="ml-sm hover:opacity-70" onClick={onClearError} aria-label="Dismiss error">
+              <button type="button" className="ms-sm hover:opacity-70" onClick={onClearError} aria-label="Dismiss error">
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
@@ -166,12 +166,12 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder={t.login.passwordPlaceholder}
-                  className="w-full bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-0 focus:ring-2 focus:ring-primary dark:focus:ring-secondary rounded-md px-md py-md font-body-md text-body-md transition-all outline-none text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40 pr-12"
+                  className="w-full bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-0 focus:ring-2 focus:ring-primary dark:focus:ring-secondary rounded-md px-md py-md font-body-md text-body-md transition-all outline-none text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40 pe-12"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -185,7 +185,7 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
               className="w-full bg-primary dark:bg-[#2563eb] hover:bg-surface-tint dark:hover:bg-[#1d4ed8] text-on-primary dark:text-white font-label-md py-md rounded-full dark:rounded-DEFAULT transition-all active:scale-95 flex items-center justify-center gap-sm mt-lg shadow-[0_10px_20px_rgba(37,99,235,0.3)]"
             >
               {t.login.signIn}
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              <span className="material-symbols-outlined text-[20px] no-flip">arrow_forward</span>
             </button>
           </form>
 
@@ -213,7 +213,7 @@ export default function LoginView({ onLogin, onRegister, error, onClearError }: 
 
         <p className="text-center font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant">
           {t.login.noAccount}
-          <button type="button" className="font-label-md text-label-md text-primary dark:text-secondary hover:underline ml-xs" onClick={() => setShowRegister(true)}>
+          <button type="button" className="font-label-md text-label-md text-primary dark:text-secondary hover:underline ms-xs" onClick={() => setShowRegister(true)}>
             {t.login.createAccount}
           </button>
         </p>

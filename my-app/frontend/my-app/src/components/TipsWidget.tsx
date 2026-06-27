@@ -33,7 +33,7 @@ export default function TipsWidget({ weather }: TipsWidgetProps) {
   }
 
   return (
-    <div className="aura-card p-lg animate-in">
+    <div className="wc-card p-lg animate-in">
       <h3 className="font-headline-md text-headline-md flex items-center gap-sm mb-md">
         <PsychologyIcon className="text-primary" />
         Today's Tips

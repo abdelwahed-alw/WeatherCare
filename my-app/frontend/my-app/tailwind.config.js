@@ -74,6 +74,7 @@ export default {
         body: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
         label: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
         headline: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        arabic: ['Cairo', 'system-ui', '-apple-system', 'sans-serif'],
       },
       fontSize: {
         display: ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],

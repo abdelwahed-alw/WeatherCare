@@ -4,7 +4,7 @@
  *  2. "Full Details" (forecast) button -> forecastModal state
  *  3. Activity add button (round FAB) -> smooth scroll top
  *  4. 5 Activity cards (Walking, Running, Cycling, Yoga, Swimming) -> selectedActivity state + card click
- *  5. Weather visual card -> visualExpanded state (expand/collapse)
+ *  5. Weather visual card -> scene image display (static, not clickable)
  *  6. Each forecast day row | decorative (not actionable)
  *  7. Hero weather card | info display (not actionable)
  *  8. Daily insight card | info display (not actionable)
@@ -36,7 +36,7 @@ function getWeatherIcon(condition: string): { icon: string; color: string } {
 }
 
 export default function HomeView({ weather, recommendations, cityName, activity = 'walk' }: HomeViewProps) {
-  const { homePage, activitiesPage } = useLocalizedData();
+  const { homePage } = useLocalizedData();
   const formatDayLabel = (day: string, index: number): string => {
     if (index === 0) return homePage.forecast.tomorrow;
     return day;
@@ -48,8 +48,7 @@ export default function HomeView({ weather, recommendations, cityName, activity 
   const [suggestionsModal, setSuggestionsModal] = useState(false);
   const [forecastModal, setForecastModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
-  const [visualExpanded, setVisualExpanded] = useState(false);
-  const [addActivityModal, setAddActivityModal] = useState(false);
+
   const [sceneImage, setSceneImage] = useState<WeatherSceneImage | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -104,8 +103,8 @@ export default function HomeView({ weather, recommendations, cityName, activity 
       {/* Hero Section: Current Weather (Bento Pattern) */}
       <section className="grid grid-cols-1 md:grid-cols-12 gap-lg">
         {/* Main Hero Card */}
-        <div className="md:col-span-8 aura-card p-lg relative overflow-hidden flex flex-col justify-between min-h-[320px]">
-          <div className="absolute -right-10 -top-10 opacity-10" aria-hidden="true">
+        <div className="md:col-span-8 wc-card p-lg relative overflow-hidden flex flex-col justify-between min-h-[320px]">
+          <div className="absolute -end-10 -top-10 opacity-10" aria-hidden="true">
             <span className="material-symbols-outlined text-[240px]" style={{ color: '#004ac6' }}>light_mode</span>
           </div>
           <div className="relative z-10">
@@ -142,7 +141,7 @@ export default function HomeView({ weather, recommendations, cityName, activity 
         </div>
 
         {/* "What to Wear" Interactive Card */}
-        <div className="md:col-span-4 aura-card p-lg bg-surface-container-low dark:bg-[#1a2a42] border-none flex flex-col">
+        <div className="md:col-span-4 wc-card p-lg bg-surface-container-low dark:bg-[#1a2a42] border-none flex flex-col">
           <div className="flex items-center gap-sm mb-md">
             <CheckroomIcon className="text-primary dark:text-primary-fixed-dim" />
             <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.whatToWear.title}</h3>
@@ -177,18 +176,13 @@ export default function HomeView({ weather, recommendations, cityName, activity 
       {/* 7-Day Forecast & Health Insights */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         {/* 7-Day Forecast */}
-        <div className="lg:col-span-2 aura-card p-lg">
+        <div className="lg:col-span-2 wc-card p-lg">
           <div className="flex items-center justify-between mb-xl">
             <div className="flex items-center gap-sm">
               <CalendarIcon className="text-primary dark:text-primary-fixed-dim" />
               <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.forecast.title}</h3>
             </div>
-            <button
-              className="text-primary dark:text-primary-fixed-dim font-label-md text-label-md hover:underline"
-              onClick={() => setForecastModal(!forecastModal)}
-            >
-              {homePage.forecast.fullDetails}
-            </button>
+            
           </div>
           <div className="space-y-sm">
             {forecast.map((day, i) => {
@@ -209,9 +203,9 @@ export default function HomeView({ weather, recommendations, cityName, activity 
 
         {/* Wellness Contextual Card */}
         <div className="flex flex-col gap-lg">
-          <div className="aura-card p-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/20 text-blue-900 dark:text-blue-50 border-none flex-grow relative overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-blue-200/50 dark:bg-blue-500/10 rounded-full blur-2xl" />
-            <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-500/10 rounded-full blur-xl" />
+          <div className="wc-card p-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/20 text-blue-900 dark:text-blue-50 border-none flex-grow relative overflow-hidden">
+            <div className="absolute -top-8 -end-8 w-32 h-32 bg-blue-200/50 dark:bg-blue-500/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-8 -start-8 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-500/10 rounded-full blur-xl" />
 
             <div className="relative z-10">
               <div className="flex items-center gap-sm mb-lg">
@@ -281,19 +275,16 @@ export default function HomeView({ weather, recommendations, cityName, activity 
           </div>
 
           {/* Weather Visual — live scene image */}
-          <button
-            className={`aura-card overflow-hidden relative flex items-center justify-center transition-all duration-500 w-full text-left ${
-              visualExpanded ? 'h-96' : 'h-48'
-            } ${sceneImage && imageLoaded ? '' : 'bg-gradient-to-br from-blue-100 dark:from-[#0b1c30] to-blue-50 dark:to-[#1a2a42]'}`}
-            onClick={() => setVisualExpanded(!visualExpanded)}
-            aria-expanded={visualExpanded}
-            aria-label={visualExpanded ? 'Collapse weather visual' : 'Expand weather visual'}
+          <div
+            className={`wc-card overflow-hidden relative flex items-center justify-center h-48 w-full ${
+              sceneImage && imageLoaded ? '' : 'bg-gradient-to-br from-blue-100 dark:from-[#0b1c30] to-blue-50 dark:to-[#1a2a42]'
+            }`}
           >
             {sceneImage && (
               <img
                 src={sceneImage.url}
                 alt=""
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`pointer-events-none absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 onLoad={() => setImageLoaded(true)}
               />
             )}
@@ -307,21 +298,14 @@ export default function HomeView({ weather, recommendations, cityName, activity 
               <span className="text-white/70 text-xs font-medium drop-shadow-md uppercase tracking-wider">{conditionBadge}</span>
               <span className="text-white font-headline-md drop-shadow-md">{activityLabel}</span>
             </div>
-          </button>
-        </div>
-      </section>
+          </div>
+          </div>
+        </section>
 
       {/* Activities Horizontal Scroll */}
       <section>
         <div className="flex items-center justify-between mb-md">
           <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.planYourActivity.title}</h3>
-          <button
-            className="w-10 h-10 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-md focus-ring"
-            onClick={() => setAddActivityModal(true)}
-            aria-label="Add activity"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
-          </button>
         </div>
         <div className="flex gap-lg overflow-x-auto pb-md custom-scrollbar">
           {activityCards.map((card, i) => {
@@ -329,7 +313,7 @@ export default function HomeView({ weather, recommendations, cityName, activity 
             return (
               <button
                 key={i}
-                className={`min-w-[200px] aura-card p-md flex flex-col items-center text-center gap-sm transition-all focus-ring ${
+                className={`min-w-[200px] wc-card p-md flex flex-col items-center text-center gap-sm transition-all focus-ring ${
                   isSelected
                     ? 'border-primary dark:border-primary-fixed-dim ring-2 ring-primary dark:ring-primary-fixed-dim'
                     : 'hover:border-primary dark:hover:border-primary-fixed-dim'
@@ -381,42 +365,6 @@ export default function HomeView({ weather, recommendations, cityName, activity 
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add Activity Modal */}
-      {addActivityModal && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
-          onClick={() => setAddActivityModal(false)}
-          onKeyDown={(e) => { if (e.key === 'Escape') setAddActivityModal(false); }}
-          role="presentation"
-          style={{ overscrollBehavior: 'contain' }}
-        >
-          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Add Activity">
-            <div className="flex items-center justify-between mb-lg">
-              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Add Activity</h3>
-              <button onClick={() => setAddActivityModal(false)} className="p-sm text-on-surface-variant dark:text-secondary-fixed-dim hover:text-on-surface dark:hover:text-inverse-on-surface rounded-full" aria-label="Close">
-                <MaterialIcon icon="close" size={24} aria-hidden="true" />
-              </button>
-            </div>
-            {activitiesPage.activities.length === 0 ? (
-              <p className="text-body-md text-on-surface-variant">No activities available</p>
-            ) : (
-              <ul className="space-y-sm">
-                {['Walking', 'Running', 'Cycling', 'Yoga', 'Swimming'].map((name, i) => (
-                  <li key={i}>
-                    <button
-                      className="w-full text-left px-md py-md rounded-xl bg-surface-container-low dark:bg-[#0b1c30] hover:bg-primary-container dark:hover:bg-primary/30 font-body-md text-body-md text-on-surface dark:text-inverse-on-surface"
-                      onClick={() => { setAddActivityModal(false); }}
-                    >
-                      {name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         </div>
       )}

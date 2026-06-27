@@ -47,7 +47,6 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
   const conditionLabel = weather.condition.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   const [fabClicked, setFabClicked] = useState(false);
   const [hydrationHistory, setHydrationHistory] = useState(false);
-  const [viewAllActivities, setViewAllActivities] = useState(false);
   const [insightModal, setInsightModal] = useState<{ type: string; title: string; description: string } | null>(null);
   const [selectedCardActivity, setSelectedCardActivity] = useState<string | null>(null);
 
@@ -93,7 +92,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
             <div className="flex justify-between items-start mb-xl">
               <div>
                 <span className="inline-flex items-center px-md py-xs bg-primary-container/10 dark:bg-primary/20 text-primary dark:text-primary-fixed-dim rounded-full font-label-sm text-label-sm mb-md">
-                  <span className="material-symbols-outlined mr-xs text-sm">light_mode</span>
+                  <span className="material-symbols-outlined me-xs text-sm">light_mode</span>
                   {activitiesPage.bestTime.optimalWindow}
                 </span>
                 <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-xs">{activitiesPage.bestTime.morningClarity}</h3>
@@ -101,7 +100,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
                   {activitiesPage.bestTime.description}
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-end">
                 <span className="font-display text-display text-primary dark:text-primary-fixed-dim">{temp}°</span>
                 <p className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim">{conditionLabel}</p>
               </div>
@@ -134,7 +133,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
           </div>
 
           {/* Background Detail */}
-          <div className="absolute right-0 top-0 w-64 h-64 -mr-20 -mt-20 opacity-10">
+          <div className="absolute end-0 top-0 w-64 h-64 -me-20 -mt-20 opacity-10">
             <span className="material-symbols-outlined text-[200px]" style={{ fontSize: '200px' }}>wb_sunny</span>
           </div>
         </div>
@@ -162,7 +161,11 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
           </div>
           <div className="flex gap-sm w-full">
             <button
-              className="flex-1 py-md bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-xl font-label-md flex items-center justify-center gap-sm active:scale-95 transition-transform"
+              className={`flex-1 py-md rounded-xl font-label-md flex items-center justify-center gap-sm active:scale-95 transition-all ${
+                activity === 'walk'
+                  ? 'bg-primary-fixed dark:bg-primary/30 text-on-primary-fixed dark:text-primary-fixed-dim ring-2 ring-primary'
+                  : 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed'
+              }`}
               onClick={() => onActivityChange('walk')}
             >
               <span className="material-symbols-outlined">directions_walk</span> {activitiesPage.hydrationPlan.start}
@@ -186,33 +189,42 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
 
         {/* Activity Selection */}
         <div className="md:col-span-12">
-          <div className="flex items-center justify-between mb-md">
-            <div className="flex items-center gap-md">
-              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{activitiesPage.startActivity.title}</h3>
-              <button
-                className="w-10 h-10 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-md"
-                onClick={() => setFabClicked(!fabClicked)}
-                aria-label={fabClicked ? 'Pause' : 'Play'}
-              >
-                <span className="material-symbols-outlined">{fabClicked ? 'pause' : 'play_arrow'}</span>
-              </button>
-            </div>
+          <div className="flex items-center justify-between mb-lg">
+            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{activitiesPage.startActivity.title}</h3>
             <button
-              className="text-primary dark:text-primary-fixed-dim font-label-md hover:underline"
-              onClick={() => setViewAllActivities(!viewAllActivities)}
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all shadow-lg active:scale-90 focus-ring ${
+                fabClicked
+                  ? 'bg-error-container dark:bg-red-900/40 text-on-error-container dark:text-red-200 shadow-red-500/20'
+                  : 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed shadow-primary/30 dark:shadow-primary/20'
+              }`}
+              onClick={() => {
+                if (fabClicked) {
+                  setFabClicked(false);
+                } else {
+                  const target = selectedCardActivity || (activity === 'walk' ? allActivities[0]?.id : activity);
+                  if (target) {
+                    onActivityChange(toActivityType(target));
+                    setFabClicked(true);
+                  }
+                }
+              }}
+              aria-label={fabClicked ? 'Pause' : 'Play'}
             >
-              {activitiesPage.startActivity.viewAll}
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{fabClicked ? 'pause' : 'play_arrow'}</span>
             </button>
           </div>
-          <div className="flex gap-md overflow-x-auto pb-sm hide-scrollbar">
+          <div className="flex gap-3 overflow-x-auto pb-sm hide-scrollbar -mx-md px-md">
             {allActivities.map((act) => {
               const isActive = isActiveActivity(act.id);
               const isSelectedCard = selectedCardActivity === act.id;
+              const selected = isActive || isSelectedCard;
               return (
                 <button
                   key={act.id}
-                  className={`flex-shrink-0 w-44 glass-card p-md flex flex-col items-center text-center cursor-pointer group transition-all ${
-                    isActive || isSelectedCard ? 'active-ring bg-primary-container dark:bg-primary/30' : 'hover:bg-primary-container dark:hover:bg-primary/30'
+                  className={`flex-shrink-0 w-[172px] rounded-2xl p-4 flex flex-col items-center text-center cursor-pointer transition-all focus-ring border group ${
+                    selected
+                      ? 'bg-primary/10 dark:bg-primary/20 border-primary/30 dark:border-primary/40 shadow-sm shadow-primary/10'
+                      : 'bg-surface-container-low dark:bg-white/5 border-transparent hover:bg-surface-container-high dark:hover:bg-white/10 hover:shadow-md active:scale-[0.97]'
                   }`}
                   onClick={() => {
                     const newId = isSelectedCard ? null : act.id;
@@ -220,23 +232,25 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
                     if (newId) onActivityChange(toActivityType(act.id));
                   }}
                 >
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-md transition-colors ${
-                    isActive || isSelectedCard
-                      ? 'bg-primary dark:bg-primary-fixed-dim'
-                      : 'bg-surface-container dark:bg-[#1e3a5f] group-hover:bg-primary/20'
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all ${
+                    selected
+                      ? 'bg-primary dark:bg-primary-fixed-dim shadow-md shadow-primary/30'
+                      : 'bg-surface-container-high dark:bg-white/10 group-hover:scale-110'
                   }`}>
-                    <span className={`material-symbols-outlined text-3xl ${
-                      isActive || isSelectedCard ? 'text-on-primary dark:text-on-primary-fixed' : 'text-primary dark:text-primary-fixed-dim'
-                    }`}>
+                    <span className={`material-symbols-outlined text-2xl ${
+                      selected
+                        ? 'text-on-primary dark:text-on-primary-fixed'
+                        : 'text-primary dark:text-primary-fixed-dim'
+                    }`} style={selected ? { fontVariationSettings: "'FILL' 1" } : {}}>
                       {act.icon}
                     </span>
                   </div>
-                  <span className={`font-headline-md text-body-lg font-bold ${
-                    isActive || isSelectedCard ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-inverse-on-surface'
+                  <span className={`font-label-md text-label-md font-semibold mb-0.5 ${
+                    selected ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-inverse-on-surface'
                   }`}>
                     {act.label}
                   </span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim leading-tight">
                     {act.subtitle}
                   </span>
                 </button>
@@ -248,7 +262,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
         {/* Insights Section */}
         <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-lg">
           <button
-            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-left focus-ring"
+            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-start focus-ring"
             onClick={() => setInsightModal({
               type: 'air',
               title: `${activitiesPage.insights.airQuality}: ${weather.airQuality?.level === 'good' ? activitiesPage.insights.excellent : activitiesPage.insights.moderate}`,
@@ -272,7 +286,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
             </div>
           </button>
           <button
-            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-left focus-ring"
+            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-start focus-ring"
             onClick={() => setInsightModal({
               type: 'uv',
               title: weather.uvIndex >= 6 ? activitiesPage.insights.uvWarning : activitiesPage.insights.uvLevel,
@@ -331,49 +345,6 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
                 <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">This Week Avg</span>
                 <span className="font-body-md text-body-md text-primary dark:text-primary-fixed-dim">1.5L</span>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* View All Activities Modal */}
-      {viewAllActivities && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
-          onClick={() => setViewAllActivities(false)}
-          onKeyDown={(e) => { if (e.key === 'Escape') setViewAllActivities(false); }}
-          role="presentation"
-          style={{ overscrollBehavior: 'contain' }}
-        >
-          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={activitiesPage.startActivity.title}>
-            <div className="flex items-center justify-between mb-lg">
-              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{activitiesPage.startActivity.title}</h3>
-              <button onClick={() => setViewAllActivities(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label={`Close ${activitiesPage.startActivity.title}`}>
-                <MaterialIcon icon="close" size={24} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 gap-md">
-              {allActivities.map((act) => (
-                <button
-                  key={act.id}
-                  className="flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container dark:hover:bg-primary/30 transition-colors text-left focus-ring"
-                  onClick={() => {
-                    if (act.id === 'walk' || act.id === 'run' || act.id === 'work') {
-                      onActivityChange(act.id as ActivityType);
-                    }
-                    setViewAllActivities(false);
-                  }}
-                >
-                  <div className="w-12 h-12 rounded-full bg-surface-container-high dark:bg-[#1e3a5f] flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">{act.icon}</span>
-                  </div>
-                  <div className="flex-1">
-                    <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface block">{act.label}</span>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">{act.subtitle}</span>
-                  </div>
-                  <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">chevron_right</span>
-                </button>
-              ))}
             </div>
           </div>
         </div>

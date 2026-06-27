@@ -27,7 +27,7 @@ function getIconColor(condition: string): string {
 
 export default function ForecastWidget({ forecast }: ForecastWidgetProps) {
   return (
-    <div className="aura-card p-lg animate-in">
+    <div className="wc-card p-lg animate-in">
       <h3 className="font-headline-md text-headline-md flex items-center gap-sm mb-md">
         <CalendarIcon className="text-primary" />
         7-Day Forecast

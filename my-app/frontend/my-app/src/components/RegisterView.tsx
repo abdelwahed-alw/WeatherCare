@@ -25,9 +25,9 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background dark:bg-[#051424] overflow-hidden">
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-2xl -left-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
-        <div className="absolute bottom-2xl right-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-2xl -start-2xl w-[500px] h-[500px] bg-primary/5 dark:bg-[#0d1c2d] rounded-full blur-[100px]" />
+        <div className="absolute bottom-2xl end-0 w-[400px] h-[400px] bg-tertiary-fixed/30 dark:bg-[#1c2b3c] rounded-full blur-[120px]" />
       </div>
 
       <header className="w-full top-0 sticky bg-surface/80 dark:bg-[#051424]/80 backdrop-blur-md z-50">
@@ -44,7 +44,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
         <div className="relative w-full h-48 mb-xl rounded-lg overflow-hidden bg-gradient-to-br from-primary/10 to-tertiary-fixed/20 dark:from-[#0d1c2d] dark:to-[#1c2b3c]">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/20 dark:to-black/20 flex flex-col justify-end p-lg">
             <h2 className="font-headline text-headline-md text-primary dark:text-secondary">
-              Welcome to Aura
+              Welcome to WeatherCare
             </h2>
             <p className="font-body text-body-md text-secondary dark:text-on-surface-variant">
               Step 1: Personal Details
@@ -66,7 +66,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
 
         <form className="space-y-lg flex-grow" onSubmit={handleSubmit}>
           <div className="space-y-xs">
-            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ml-xs" htmlFor="reg-name">
+            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ms-xs" htmlFor="reg-name">
               Full Name
             </label>
             <div className="relative group">
@@ -76,7 +76,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="John Doe"
-                className="aura-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
+                className="wc-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
               />
               <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-outline dark:text-outline group-focus-within:text-primary dark:group-focus-within:text-secondary transition-colors">
                 person
@@ -85,7 +85,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
           </div>
 
           <div className="space-y-xs">
-            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ml-xs" htmlFor="reg-email">
+            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ms-xs" htmlFor="reg-email">
               Email Address
             </label>
             <div className="relative group">
@@ -94,8 +94,8 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="hello@aura.com"
-                className="aura-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
+                placeholder="hello@weathercare.app"
+                className="wc-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
               />
               <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-outline dark:text-outline group-focus-within:text-primary dark:group-focus-within:text-secondary transition-colors">
                 mail
@@ -104,7 +104,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
           </div>
 
           <div className="space-y-xs">
-            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ml-xs" htmlFor="reg-password">
+            <label className="block font-label text-label-md text-on-surface-variant dark:text-on-surface-variant ms-xs" htmlFor="reg-password">
               Password
             </label>
             <div className="relative group">
@@ -114,18 +114,18 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="aura-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
+                className="wc-input w-full px-lg py-md bg-[#F1F5F9] dark:bg-[rgba(1,15,31,0.4)] dark:border dark:border-[rgba(144,144,151,0.2)] border-none rounded-lg font-body text-body-md transition-all duration-200 text-on-surface dark:text-on-surface placeholder:text-on-surface-variant/40"
               />
               <button
                 type="button"
-                className="absolute right-md top-1/2 -translate-y-1/2 text-outline dark:text-outline hover:text-primary dark:hover:text-secondary transition-colors"
+                className="absolute end-md top-1/2 -translate-y-1/2 text-outline dark:text-outline hover:text-primary dark:hover:text-secondary transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 <span className="material-symbols-outlined">{showPassword ? 'visibility_off' : 'visibility'}</span>
               </button>
             </div>
-            <p className="text-[11px] text-outline dark:text-outline ml-xs mt-xs">
+            <p className="text-[11px] text-outline dark:text-outline ms-xs mt-xs">
               Must be at least 8 characters with a symbol.
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function RegisterView({ onNext, onSignIn }: RegisterViewProps) {
               className="w-full bg-primary dark:bg-[#2563eb] text-on-primary dark:text-white font-label text-label-md py-lg rounded-full hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-sm shadow-[0_4px_12px_rgba(0,74,198,0.3)]"
             >
               Next
-              <span className="material-symbols-outlined">arrow_forward</span>
+              <span className="material-symbols-outlined no-flip">arrow_forward</span>
             </button>
 
             <div className="flex items-center justify-center pt-md">

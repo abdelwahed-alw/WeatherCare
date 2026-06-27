@@ -4,7 +4,7 @@
 
 :root {
   --font: 'Geist', system-ui, -apple-system, sans-serif;
-  --font-ar: 'Noto Sans Arabic', system-ui, -apple-system, sans-serif;
+  --font-ar: 'Cairo', system-ui, -apple-system, sans-serif;
   --nav-height: 72px;
   --header-height: 64px;
 }
@@ -25,7 +25,7 @@
   opacity: 0.7;
 }
 
-.aura-card {
+.wc-card {
   background-color: #ffffff;
   border: 1px solid #F1F5F9;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.04);
@@ -33,17 +33,17 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.dark .aura-card {
+.dark .wc-card {
   background-color: #1a2a42;
   border-color: #2a3a52;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.aura-card:hover {
+.wc-card:hover {
   box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.06);
 }
 
-.dark .aura-card:hover {
+.dark .wc-card:hover {
   box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -166,7 +166,7 @@ button, a, input, select, textarea, [role="button"] {
   --font: var(--font-ar);
 }
 
-[dir="rtl"] .material-symbols-outlined {
+[dir="rtl"] .material-symbols-outlined:not(.no-flip) {
   transform: scaleX(-1);
 }
 
@@ -189,6 +189,17 @@ button, a, input, select, textarea, [role="button"] {
 
 [dir="rtl"] .flex.items-center.justify-between {
   text-align: right;
+}
+
+[dir="rtl"] .toggle-knob {
+  left: auto !important;
+  right: 2px !important;
+}
+
+[dir="rtl"] .toggle-knob.active {
+  left: auto !important;
+  right: calc(100% - 22px) !important;
+  transform: none !important;
 }
 
 *, *::before, *::after {
