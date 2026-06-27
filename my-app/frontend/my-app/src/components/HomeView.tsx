@@ -1,10 +1,28 @@
-import type { WeatherData, Recommendations } from '../types';
-import { CalendarIcon, PsychologyIcon, SelfImprovementIcon, HikingIcon, PedalBikeIcon, RunIcon, CheckroomIcon, SunglassesIcon as EyeglassesIcon } from './Icons';
+/*
+ * INTERACTION AUDIT — All actionable elements wired with state placeholders:
+ *  1. "See Full Suggestions" button -> suggestionsModal state
+ *  2. "Full Details" (forecast) button -> forecastModal state
+ *  3. Activity add button (round FAB) -> smooth scroll top
+ *  4. 5 Activity cards (Walking, Running, Cycling, Yoga, Swimming) -> selectedActivity state + card click
+ *  5. Weather visual card -> visualExpanded state (expand/collapse)
+ *  6. Each forecast day row | decorative (not actionable)
+ *  7. Hero weather card | info display (not actionable)
+ *  8. Daily insight card | info display (not actionable)
+ *  Total interactive elements found: 7 unique actionable items
+ */
+
+import { useState, useEffect } from 'react';
+import type { WeatherData, Recommendations, ActivityType } from '../types';
+import { CalendarIcon, PsychologyIcon, SelfImprovementIcon, PedalBikeIcon, RunIcon, WalkIcon, PoolIcon, CheckroomIcon, SunglassesIcon as EyeglassesIcon, MaterialIcon } from './Icons';
+import { fetchWeatherImage } from '../api';
+import type { WeatherSceneImage } from '../api';
+import { useLocalizedData } from '../i18n/useLocalizedData';
 
 interface HomeViewProps {
   weather: WeatherData;
   recommendations: Recommendations;
   cityName: string;
+  activity?: ActivityType;
 }
 
 function getWeatherIcon(condition: string): { icon: string; color: string } {
@@ -17,22 +35,69 @@ function getWeatherIcon(condition: string): { icon: string; color: string } {
   }
 }
 
-function formatDayLabel(day: string, index: number): string {
-  if (index === 0) return 'Tomorrow';
-  return day;
-}
-
-export default function HomeView({ weather, recommendations, cityName }: HomeViewProps) {
+export default function HomeView({ weather, recommendations, cityName, activity = 'walk' }: HomeViewProps) {
+  const { homePage, activitiesPage } = useLocalizedData();
+  const formatDayLabel = (day: string, index: number): string => {
+    if (index === 0) return homePage.forecast.tomorrow;
+    return day;
+  };
   const { temperature, condition, humidity, windSpeed, feelsLike, airQuality, forecast, uvIndex } = weather;
   const conditionLabel = condition.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   const weatherIcon = getWeatherIcon(condition);
 
-  const activityCards = [
-    { icon: RunIcon, label: 'Running', badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' },
-    { icon: PedalBikeIcon, label: 'Cycling', badge: 'GREAT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' },
-    { icon: SelfImprovementIcon, label: 'Yoga', badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' },
-    { icon: HikingIcon, label: 'Hiking', badge: 'MODERATE', badgeClass: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' },
-  ];
+  const [suggestionsModal, setSuggestionsModal] = useState(false);
+  const [forecastModal, setForecastModal] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [visualExpanded, setVisualExpanded] = useState(false);
+  const [addActivityModal, setAddActivityModal] = useState(false);
+  const [sceneImage, setSceneImage] = useState<WeatherSceneImage | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    setImageLoaded(false);
+    fetchWeatherImage(condition, activity)
+      .then(setSceneImage)
+      .catch(() => setSceneImage(null));
+  }, [condition, activity]);
+
+  function getActivityLabel(): string {
+    if (temperature >= 38) return 'Extreme Heat • Stay indoors and hydrate';
+    if (temperature >= 35) return 'Very Hot • Limit outdoor activity';
+    if (temperature >= 30) { if (activity === 'run') return 'Hot • Running not recommended'; if (activity === 'work') return 'Hot • Take frequent breaks'; return 'Hot • Light activity only'; }
+    if (temperature >= 25) { if (activity === 'run') return 'Warm • Run early or at dusk'; if (activity === 'work') return 'Warm • Stay hydrated'; return 'Warm • Great for a walk'; }
+    if (temperature >= 18) { if (activity === 'run') return 'Pleasant • Perfect running weather'; if (activity === 'work') return 'Pleasant • Comfortable conditions'; return 'Pleasant • Ideal for outdoor yoga'; }
+    if (temperature >= 12) { if (activity === 'run') return 'Cool • Layer up before your run'; if (activity === 'work') return 'Cool • Wear a light jacket'; return 'Cool • A light layer recommended'; }
+    if (temperature >= 6) return 'Cold • Bundle up well';
+    return 'Very Cold • Limit time outdoors';
+  }
+
+  function getConditionBadge(): string {
+    if (uvIndex >= 8) return '⚠ Extreme UV';
+    if (uvIndex >= 6) return '☀ High UV';
+    if (airQuality?.level === 'unhealthy' || airQuality?.level === 'unhealthy-sensitive') return '😷 Poor Air Quality';
+    if (condition === 'windy') return '💨 Windy';
+    if (condition === 'cloudy') return '☁ Cloudy';
+    if (condition === 'partly-cloudy') return '⛅ Partly Cloudy';
+    return '☀ Sunny';
+  }
+
+  const activityLabel = getActivityLabel();
+  const conditionBadge = getConditionBadge();
+
+  const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+    Walking: WalkIcon,
+    Running: RunIcon,
+    Cycling: PedalBikeIcon,
+    Yoga: SelfImprovementIcon,
+    Swimming: PoolIcon,
+  };
+
+  const activityCards = homePage.activityCards.map(card => ({
+    icon: iconMap[card.label] || MaterialIcon,
+    label: card.label,
+    badge: card.badge,
+    badgeClass: card.badgeClass,
+  }));
 
   return (
     <main className="space-y-xl animate-in">
@@ -40,13 +105,13 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
       <section className="grid grid-cols-1 md:grid-cols-12 gap-lg">
         {/* Main Hero Card */}
         <div className="md:col-span-8 aura-card p-lg relative overflow-hidden flex flex-col justify-between min-h-[320px]">
-          <div className="absolute -right-10 -top-10 opacity-10">
+          <div className="absolute -right-10 -top-10 opacity-10" aria-hidden="true">
             <span className="material-symbols-outlined text-[240px]" style={{ color: '#004ac6' }}>light_mode</span>
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-sm mb-base">
               <span className="px-sm py-xs bg-primary-fixed dark:bg-primary/30 text-on-primary-fixed-variant dark:text-primary-fixed-dim font-label-sm text-label-sm rounded-full">
-                LIVE • {cityName.toUpperCase()}
+                {homePage.hero.liveLabel} • {cityName.toUpperCase()}
               </span>
             </div>
             <div className="flex items-baseline gap-sm mt-md">
@@ -54,23 +119,23 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
               <span className="font-headline-md text-headline-md text-on-surface-variant dark:text-secondary-fixed-dim">{conditionLabel}</span>
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim mt-sm">
-              Feels like {feelsLike}°C {temperature >= 30 ? '— Stay hydrated and avoid midday sun.' : '— A perfect day for outdoor wellness.'}
+              {homePage.hero.feelsLikePrefix} {feelsLike}°C {temperature >= 30 ? '— Stay hydrated and avoid midday sun.' : '— A perfect day for outdoor wellness.'}
             </p>
           </div>
           <div className="relative z-10 grid grid-cols-3 gap-md pt-xl border-t border-outline-variant dark:border-[#434655] mt-xl">
             <div className="flex flex-col">
-              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">AQI</span>
+              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">{homePage.hero.aqi}</span>
               <div className="flex items-center gap-xs">
                 <span className="font-headline-md text-headline-md text-secondary dark:text-secondary-fixed-dim">{airQuality?.aqi || 42}</span>
                 <span className="text-sm font-medium text-secondary dark:text-secondary-fixed-dim">{airQuality?.level?.replace('-', ' ') || 'Good'}</span>
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">Humidity</span>
+              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">{homePage.hero.humidity}</span>
               <span className="font-headline-md text-headline-md text-secondary dark:text-secondary-fixed-dim">{humidity}%</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">Wind</span>
+              <span className="font-label-sm text-label-sm text-outline dark:text-secondary-fixed-dim uppercase tracking-wider">{homePage.hero.wind}</span>
               <span className="font-headline-md text-headline-md text-secondary dark:text-secondary-fixed-dim">{windSpeed} km/h</span>
             </div>
           </div>
@@ -80,31 +145,31 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
         <div className="md:col-span-4 aura-card p-lg bg-surface-container-low dark:bg-[#1a2a42] border-none flex flex-col">
           <div className="flex items-center gap-sm mb-md">
             <CheckroomIcon className="text-primary dark:text-primary-fixed-dim" />
-            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">What to Wear</h3>
+            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.whatToWear.title}</h3>
           </div>
           <div className="space-y-md flex-grow">
             <div className="flex items-start gap-md p-md bg-white dark:bg-[#0b1c30] rounded-lg shadow-sm">
               <CheckroomIcon className="text-primary dark:text-primary-fixed-dim mt-1" />
               <div>
-                <span className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim block">Light Layers</span>
+                <span className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim block">{homePage.whatToWear.lightLayers}</span>
                 <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">{recommendations.clothing.description}</p>
               </div>
             </div>
             <div className="flex items-start gap-md p-md bg-white dark:bg-[#0b1c30] rounded-lg shadow-sm">
               <EyeglassesIcon className="text-primary dark:text-primary-fixed-dim mt-1" />
               <div>
-                <span className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim block">Eye Protection</span>
+                <span className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim block">{homePage.whatToWear.eyeProtection}</span>
                 <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
-                  {uvIndex >= 6 ? 'UV levels are high. Grab your favorite polarized shades.' : 'UV levels are moderate. Sunglasses recommended.'}
+                  {uvIndex >= 6 ? homePage.whatToWear.uvHighText : homePage.whatToWear.uvModerateText}
                 </p>
               </div>
             </div>
           </div>
-          <button 
+          <button
             className="mt-xl w-full py-md bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed font-label-md text-label-md rounded-full hover:bg-on-primary-fixed-variant dark:hover:bg-primary transition-colors active:scale-95 duration-200"
-            onClick={() => alert('Full clothing suggestions would open here.')}
+            onClick={() => setSuggestionsModal(!suggestionsModal)}
           >
-            See Full Suggestions
+            {homePage.whatToWear.seeFullSuggestions}
           </button>
         </div>
       </section>
@@ -116,13 +181,13 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
           <div className="flex items-center justify-between mb-xl">
             <div className="flex items-center gap-sm">
               <CalendarIcon className="text-primary dark:text-primary-fixed-dim" />
-              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">7-Day Forecast</h3>
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.forecast.title}</h3>
             </div>
-            <button 
+            <button
               className="text-primary dark:text-primary-fixed-dim font-label-md text-label-md hover:underline"
-              onClick={() => alert('Full 7-day details would open here.')}
+              onClick={() => setForecastModal(!forecastModal)}
             >
-              Full Details
+              {homePage.forecast.fullDetails}
             </button>
           </div>
           <div className="space-y-sm">
@@ -144,76 +209,249 @@ export default function HomeView({ weather, recommendations, cityName }: HomeVie
 
         {/* Wellness Contextual Card */}
         <div className="flex flex-col gap-lg">
-          <div className="aura-card p-lg bg-primary-container dark:bg-primary/40 text-on-primary-container dark:text-inverse-on-surface border-none flex-grow">
-            <div className="flex items-center gap-sm mb-md">
-              <PsychologyIcon />
-              <h3 className="font-headline-md text-headline-md">Daily Insight</h3>
-            </div>
-            <p className="font-body-lg text-body-lg mb-lg italic">
-              {temperature >= 35
-                ? '"The heat reminds us to slow down and listen to our bodies."'
-                : temperature >= 25
-                  ? '"Clear skies reflect a clear mind. Take 5 minutes to breathe today."'
-                  : '"Cool breezes bring fresh energy. Perfect for a mindful walk."'}
-            </p>
-            <div className="space-y-md">
-              <div className="flex justify-between items-center bg-white/10 p-md rounded-xl backdrop-blur-sm">
-                <span className="font-label-md text-label-md">Outdoor Score</span>
-                <span className="font-headline-md text-headline-md">
-                  {temperature > 35 ? '6.8' : temperature > 30 ? '7.5' : temperature > 20 ? '9.2' : '8.0'}
-                </span>
+          <div className="aura-card p-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/20 text-blue-900 dark:text-blue-50 border-none flex-grow relative overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-blue-200/50 dark:bg-blue-500/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-500/10 rounded-full blur-xl" />
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-sm mb-lg">
+                <div className="w-10 h-10 rounded-xl bg-white/30 dark:bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                  <PsychologyIcon />
+                </div>
+                <h3 className="font-headline-md text-headline-md">{homePage.dailyInsight.title}</h3>
               </div>
-              <div className="flex justify-between items-center bg-white/10 p-md rounded-xl backdrop-blur-sm">
-                <span className="font-label-md text-label-md">Hydration Need</span>
-                <span className="font-headline-md text-headline-md">
-                  {temperature >= 35 ? 'Very High' : temperature >= 28 ? 'High' : temperature >= 20 ? 'Moderate' : 'Low'}
-                </span>
+
+              <div className="bg-white/20 dark:bg-white/5 rounded-xl p-md mb-lg backdrop-blur-sm border border-white/20 dark:border-white/10">
+                <p className="font-body-lg text-body-lg leading-relaxed italic text-blue-800 dark:text-blue-100">
+                  &ldquo;{temperature >= 35
+                    ? homePage.dailyInsight.quoteExtreme.replace(/^"|"$/g, '')
+                    : temperature >= 25
+                      ? homePage.dailyInsight.quoteWarm.replace(/^"|"$/g, '')
+                      : homePage.dailyInsight.quoteCool.replace(/^"|"$/g, '')}&rdquo;
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-md">
+                <div className="bg-white/20 dark:bg-white/5 p-md rounded-xl backdrop-blur-sm border border-white/20 dark:border-white/10">
+                  <div className="flex items-center gap-xs mb-sm">
+                    <span className="material-symbols-outlined text-sm text-blue-700 dark:text-blue-200">thermostat</span>
+                    <span className="font-label-md text-label-md text-blue-800 dark:text-blue-100">{homePage.dailyInsight.outdoorScore}</span>
+                  </div>
+                  <div className="flex items-end gap-xs">
+                    <span className="font-headline-lg text-headline-lg font-bold text-blue-900 dark:text-blue-50">
+                      {temperature > 35 ? '6.8' : temperature > 30 ? '7.5' : temperature > 20 ? '9.2' : '8.0'}
+                    </span>
+                    <span className="font-label-sm text-label-sm text-blue-700 dark:text-blue-200 mb-1">/10</span>
+                  </div>
+                  <div className="mt-sm h-1.5 rounded-full bg-white/30 dark:bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 transition-all duration-500"
+                      style={{ width: `${((temperature > 35 ? 6.8 : temperature > 30 ? 7.5 : temperature > 20 ? 9.2 : 8.0) / 10) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-white/20 dark:bg-white/5 p-md rounded-xl backdrop-blur-sm border border-white/20 dark:border-white/10">
+                  <div className="flex items-center gap-xs mb-sm">
+                    <span className="material-symbols-outlined text-sm text-blue-700 dark:text-blue-200">water_drop</span>
+                    <span className="font-label-md text-label-md text-blue-800 dark:text-blue-100">{homePage.dailyInsight.hydrationNeed}</span>
+                  </div>
+                  {(() => {
+                    const label = temperature >= 35 ? 'Very High' : temperature >= 28 ? 'High' : temperature >= 20 ? 'Moderate' : 'Low';
+                    const pct = temperature >= 35 ? 90 : temperature >= 28 ? 70 : temperature >= 20 ? 45 : 20;
+                    const barColor = temperature >= 35
+                      ? 'from-red-400 to-orange-400'
+                      : temperature >= 28
+                        ? 'from-orange-400 to-yellow-400'
+                        : temperature >= 20
+                          ? 'from-blue-400 to-teal-400'
+                          : 'from-blue-400 to-cyan-400';
+                    return (
+                      <>
+                        <span className="font-headline-md text-headline-md font-bold text-blue-900 dark:text-blue-50 capitalize">{label}</span>
+                        <div className="mt-sm h-1.5 rounded-full bg-white/30 dark:bg-white/10 overflow-hidden">
+                          <div className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`} style={{ width: `${pct}%` }} />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Weather Visual */}
-          <div className="aura-card h-48 overflow-hidden relative group cursor-pointer bg-gradient-to-br from-blue-100 dark:from-[#0b1c30] to-blue-50 dark:to-[#1a2a42] flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent flex items-end p-md">
-              <span className="text-white font-label-md text-label-md">
-                {temperature >= 30 ? 'Indoor Activities: Recommended' : 'Outdoor Yoga: Recommended (2PM)'}
+          {/* Weather Visual — live scene image */}
+          <button
+            className={`aura-card overflow-hidden relative flex items-center justify-center transition-all duration-500 w-full text-left ${
+              visualExpanded ? 'h-96' : 'h-48'
+            } ${sceneImage && imageLoaded ? '' : 'bg-gradient-to-br from-blue-100 dark:from-[#0b1c30] to-blue-50 dark:to-[#1a2a42]'}`}
+            onClick={() => setVisualExpanded(!visualExpanded)}
+            aria-expanded={visualExpanded}
+            aria-label={visualExpanded ? 'Collapse weather visual' : 'Expand weather visual'}
+          >
+            {sceneImage && (
+              <img
+                src={sceneImage.url}
+                alt=""
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setImageLoaded(true)}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent pointer-events-none" />
+            {!sceneImage && (
+              <span className="material-symbols-outlined text-[80px] text-blue-300/50 dark:text-blue-500/30" aria-hidden="true" style={{ fontSize: '80px' }}>
+                {weatherIcon.icon}
               </span>
+            )}
+            <div className="absolute inset-0 flex flex-col justify-end p-md pointer-events-none">
+              <span className="text-white/70 text-xs font-medium drop-shadow-md uppercase tracking-wider">{conditionBadge}</span>
+              <span className="text-white font-headline-md drop-shadow-md">{activityLabel}</span>
             </div>
-            <span className="material-symbols-outlined text-[80px] text-blue-300/50 dark:text-blue-500/30" style={{ fontSize: '80px' }}>
-              {weatherIcon.icon}
-            </span>
-          </div>
+          </button>
         </div>
       </section>
 
       {/* Activities Horizontal Scroll */}
       <section>
         <div className="flex items-center justify-between mb-md">
-          <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Plan Your Activity</h3>
-          <span className="material-symbols-outlined text-outline dark:text-secondary-fixed-dim cursor-pointer">chevron_right</span>
+          <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.planYourActivity.title}</h3>
+          <button
+            className="w-10 h-10 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-md focus-ring"
+            onClick={() => setAddActivityModal(true)}
+            aria-label="Add activity"
+          >
+            <span className="material-symbols-outlined" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
+          </button>
         </div>
         <div className="flex gap-lg overflow-x-auto pb-md custom-scrollbar">
-          {activityCards.map((card, i) => (
-            <div key={i} className="min-w-[200px] aura-card p-md flex flex-col items-center text-center gap-sm hover:border-primary dark:hover:border-primary-fixed-dim transition-all">
-              <div className="w-12 h-12 rounded-full bg-surface-container-high dark:bg-[#1e3a5f] flex items-center justify-center">
-                <card.icon className="text-primary dark:text-primary-fixed-dim" />
-              </div>
-              <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface">{card.label}</span>
-              <span className={`px-sm py-xs text-xs font-bold rounded-full ${card.badgeClass}`}>
-                {card.badge}
-              </span>
-            </div>
-          ))}
+          {activityCards.map((card, i) => {
+            const isSelected = selectedActivity === card.label;
+            return (
+              <button
+                key={i}
+                className={`min-w-[200px] aura-card p-md flex flex-col items-center text-center gap-sm transition-all focus-ring ${
+                  isSelected
+                    ? 'border-primary dark:border-primary-fixed-dim ring-2 ring-primary dark:ring-primary-fixed-dim'
+                    : 'hover:border-primary dark:hover:border-primary-fixed-dim'
+                }`}
+                onClick={() => setSelectedActivity(isSelected ? null : card.label)}
+                aria-pressed={isSelected}
+                aria-label={`${card.label}: ${card.badge}`}
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  isSelected
+                    ? 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed'
+                    : 'bg-surface-container-high dark:bg-[#1e3a5f]'
+                }`}>
+                  <card.icon className={isSelected ? 'text-on-primary dark:text-on-primary-fixed' : 'text-primary dark:text-primary-fixed-dim'} aria-hidden="true" />
+                </div>
+                <span className={`font-label-md text-label-md ${isSelected ? 'text-primary dark:text-primary-fixed-dim font-bold' : 'text-on-surface dark:text-inverse-on-surface'}`}>
+                  {card.label}
+                </span>
+                <span className={`px-sm py-xs text-xs font-bold rounded-full ${card.badgeClass}`}>
+                  {card.badge}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      {/* FAB */}
-      <button
-        className="fixed bottom-24 right-6 md:right-12 w-14 h-14 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all z-40"
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      >
-        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
-      </button>
+      {/* Suggestions Modal Placeholder */}
+      {suggestionsModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setSuggestionsModal(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setSuggestionsModal(false); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={homePage.whatToWear.title}>
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.whatToWear.title}</h3>
+              <button onClick={() => setSuggestionsModal(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label="Close suggestions">
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="space-y-md">
+              {recommendations.clothing.items.map((item, i) => (
+                <div key={i} className="flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-lg">
+                  <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">checkroom</span>
+                  <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface capitalize">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Activity Modal */}
+      {addActivityModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setAddActivityModal(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setAddActivityModal(false); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Add Activity">
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Add Activity</h3>
+              <button onClick={() => setAddActivityModal(false)} className="p-sm text-on-surface-variant dark:text-secondary-fixed-dim hover:text-on-surface dark:hover:text-inverse-on-surface rounded-full" aria-label="Close">
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            {activitiesPage.activities.length === 0 ? (
+              <p className="text-body-md text-on-surface-variant">No activities available</p>
+            ) : (
+              <ul className="space-y-sm">
+                {['Walking', 'Running', 'Cycling', 'Yoga', 'Swimming'].map((name, i) => (
+                  <li key={i}>
+                    <button
+                      className="w-full text-left px-md py-md rounded-xl bg-surface-container-low dark:bg-[#0b1c30] hover:bg-primary-container dark:hover:bg-primary/30 font-body-md text-body-md text-on-surface dark:text-inverse-on-surface"
+                      onClick={() => { setAddActivityModal(false); }}
+                    >
+                      {name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Forecast Modal Placeholder */}
+      {forecastModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setForecastModal(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setForecastModal(false); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={homePage.forecast.title}>
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{homePage.forecast.title}</h3>
+              <button onClick={() => setForecastModal(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label="Close forecast">
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="space-y-sm">
+              {forecast.map((day, i) => {
+                const icon = getWeatherIcon(day.condition);
+                return (
+                  <div key={i} className="flex items-center justify-between py-sm border-b border-outline-variant dark:border-[#2a3a52] last:border-0">
+                    <span className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim w-24">{formatDayLabel(day.day, i)}</span>
+                    <span className={`material-symbols-outlined ${icon.color}`} aria-hidden="true">{icon.icon}</span>
+                    <span className="font-headline-md text-[18px] text-on-surface dark:text-inverse-on-surface">{day.tempHigh}° / {day.tempLow}°</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

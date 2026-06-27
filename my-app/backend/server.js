@@ -1,11 +1,47 @@
 const express = require('express');
 const cors = require('cors');
+const crypto = require('crypto');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// ─── Auth Store (in-memory) ─────────────────────────────────────────────
+const users = [];
+const sessions = new Map();
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derivedKey = crypto.scryptSync(password, salt, 64);
+  return salt + ':' + derivedKey.toString('hex');
+}
+
+function verifyPassword(password, hash) {
+  const [salt, key] = hash.split(':');
+  const derivedKey = crypto.scryptSync(password, salt, 64);
+  return crypto.timingSafeEqual(Buffer.from(key, 'hex'), derivedKey);
+}
+
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or invalid authorization header' });
+  }
+  const token = header.slice(7);
+  const user = sessions.get(token);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid or expired session' });
+  }
+  req.user = user;
+  req.token = token;
+  next();
+}
 
 // ─── Moroccan Cities Database ───────────────────────────────────────
 const cities = [
@@ -185,6 +221,80 @@ function getRecommendations(weather, activity) {
     allergy: { hasAlert, severity: sev, message: msg, triggers },
   };
 }
+
+// ─── Auth Routes ─────────────────────────────────────────────────────────
+
+// POST /api/auth/register – create account
+app.post('/api/auth/register', (req, res) => {
+  const { name, email, password, preferences } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Name, email, and password are required' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  }
+  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+    return res.status(409).json({ error: 'An account with this email already exists' });
+  }
+
+  const user = {
+    id: users.length + 1,
+    name,
+    email: email.toLowerCase(),
+    passwordHash: hashPassword(password),
+    preferences: Array.isArray(preferences) ? preferences : [],
+    createdAt: new Date().toISOString(),
+  };
+  users.push(user);
+
+  const token = generateToken();
+  sessions.set(token, { id: user.id, name: user.name, email: user.email, preferences: user.preferences });
+
+  res.status(201).json({
+    token,
+    user: { id: user.id, name: user.name, email: user.email, preferences: user.preferences },
+  });
+});
+
+// POST /api/auth/login – sign in
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (!user || !verifyPassword(password, user.passwordHash)) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  const token = generateToken();
+  sessions.set(token, { id: user.id, name: user.name, email: user.email, preferences: user.preferences });
+
+  res.json({
+    token,
+    user: { id: user.id, name: user.name, email: user.email, preferences: user.preferences },
+  });
+});
+
+// GET /api/auth/me – current user (requires Bearer token)
+app.get('/api/auth/me', authMiddleware, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// PUT /api/auth/preferences – update preferences
+app.put('/api/auth/preferences', authMiddleware, (req, res) => {
+  const { preferences } = req.body;
+  if (!Array.isArray(preferences)) {
+    return res.status(400).json({ error: 'Preferences must be an array' });
+  }
+  const user = users.find(u => u.id === req.user.id);
+  if (user) user.preferences = preferences;
+  req.user.preferences = preferences;
+  sessions.set(req.token, req.user);
+  res.json({ preferences });
+});
 
 // ─── API Routes ───────────────────────────────────────────────────────
 

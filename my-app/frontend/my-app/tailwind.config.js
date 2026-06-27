@@ -70,10 +70,10 @@ export default {
         '2xl': '48px',
       },
       fontFamily: {
-        display: ['Geist', 'sans-serif'],
-        body: ['Geist', 'sans-serif'],
-        label: ['Geist', 'sans-serif'],
-        headline: ['Geist', 'sans-serif'],
+        display: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        body: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        label: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        headline: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       fontSize: {
         display: ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],

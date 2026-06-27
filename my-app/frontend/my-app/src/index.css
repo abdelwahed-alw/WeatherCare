@@ -13,6 +13,18 @@
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
+.material-symbols-outlined[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.material-symbols-outlined:not(:defined) {
+  font-family: 'system-ui', sans-serif;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
 .aura-card {
   background-color: #ffffff;
   border: 1px solid #F1F5F9;
@@ -74,6 +86,58 @@
   box-shadow: 0 0 0 2px #004ac6;
 }
 
+.focus-ring:focus-visible {
+  outline: 2px solid #004ac6;
+  outline-offset: 2px;
+}
+
+.dark .focus-ring:focus-visible {
+  outline-color: #6b8fff;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 8px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: #004ac6;
+  color: #fff;
+  border-radius: 0 0 8px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  scroll-margin-top: 80px;
+  text-wrap: balance;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -102,12 +166,49 @@
   --font: var(--font-ar);
 }
 
+[dir="rtl"] .material-symbols-outlined {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .search-input-wrap {
+  direction: rtl;
+}
+
+[dir="rtl"] .search-result-item {
+  text-align: right;
+}
+
+[dir="rtl"] .result-name-ar {
+  direction: ltr;
+  text-align: left;
+}
+
+[dir="rtl"] .profile-row-left {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .flex.items-center.justify-between {
+  text-align: right;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {

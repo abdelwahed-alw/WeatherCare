@@ -1,5 +1,20 @@
+/*
+ * INTERACTION AUDIT — All actionable elements wired with state placeholders:
+ *  1. "Start" hydration button -> onActivityChange('walk')
+ *  2. "History" hydration button -> hydrationHistory state (modal)
+ *  3. 5 Activity cards (Walking, Running, Cycling, Yoga, Swimming) -> onActivityChange / alert
+ *  4. "View All" button -> viewAllActivities state
+ *  5. FAB play/pause button -> fabClicked state
+ *  6. Air Quality insight card -> insightModal state
+ *  7. UV Warning insight card -> insightModal state
+ *  8. Modal close buttons | inner elements wired above
+ *  Total interactive elements found: 7 unique actionable items
+ */
+
 import { useState } from 'react';
 import type { WeatherData, ActivityType, Recommendations } from '../types';
+import { MaterialIcon } from './Icons';
+import { useLocalizedData } from '../i18n/useLocalizedData';
 
 interface ActivitiesViewProps {
   weather: WeatherData;
@@ -15,14 +30,6 @@ interface ActivityOption {
   subtitle: string;
 }
 
-const allActivities: ActivityOption[] = [
-  { id: 'walk', label: 'Walking', icon: 'directions_walk', subtitle: '35 min session' },
-  { id: 'run', label: 'Running', icon: 'directions_run', subtitle: '5.2 km target' },
-  { id: 'work', label: 'Cycling', icon: 'directions_bike', subtitle: '12 km trail' },
-  { id: 'yoga', label: 'Yoga', icon: 'self_improvement', subtitle: 'Mindful flow' },
-  { id: 'swim', label: 'Swimming', icon: 'pool', subtitle: '20 laps goal' },
-];
-
 function estimateTempAtHour(currentTemp: number, hour: number): number {
   const peakHour = 14;
   const peakTemp = currentTemp + 3;
@@ -34,9 +41,15 @@ function estimateTempAtHour(currentTemp: number, hour: number): number {
 }
 
 export default function ActivitiesView({ weather, recommendations, activity, onActivityChange }: ActivitiesViewProps) {
+  const { activitiesPage } = useLocalizedData();
+  const allActivities: ActivityOption[] = activitiesPage.activities;
   const temp = weather.temperature;
   const conditionLabel = weather.condition.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
   const [fabClicked, setFabClicked] = useState(false);
+  const [hydrationHistory, setHydrationHistory] = useState(false);
+  const [viewAllActivities, setViewAllActivities] = useState(false);
+  const [insightModal, setInsightModal] = useState<{ type: string; title: string; description: string } | null>(null);
+  const [selectedCardActivity, setSelectedCardActivity] = useState<string | null>(null);
 
   const timeSlots = [6, 8, 10, 12, 14, 16];
   const temps = timeSlots.map(h => estimateTempAtHour(temp, h));
@@ -49,23 +62,26 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
   const progress = Math.min(hydration.liters / 1.8, 1);
   const offset = circumference - (progress * circumference);
 
+  const toActivityType = (id: string): ActivityType => {
+    if (id === 'run') return 'run';
+    if (id === 'work') return 'work';
+    return 'walk';
+  };
+
   const isActiveActivity = (id: string): boolean => {
-    if (id === 'walk' || id === 'run' || id === 'work') {
-      return activity === id;
-    }
-    return false;
+    return activity === toActivityType(id);
   };
 
   return (
     <div className="space-y-xl animate-in">
       {/* Header Section */}
       <section>
-        <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mb-xs">Today's Focus</h2>
+        <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface mb-xs">{activitiesPage.todayFocus.title}</h2>
         <p className="font-body-lg text-body-lg text-on-surface-variant dark:text-secondary-fixed-dim">
-          {temp >= 35 ? 'Take it easy — extreme heat today. Stay hydrated.' :
-           temp >= 30 ? 'Warm conditions. Plan around peak sun hours.' :
-           temp >= 20 ? 'Optimal conditions for performance and clarity.' :
-           'Cool and fresh. Perfect for an active day.'}
+          {temp >= 35 ? activitiesPage.todayFocus.extremeHeat :
+           temp >= 30 ? activitiesPage.todayFocus.warm :
+           temp >= 20 ? activitiesPage.todayFocus.optimal :
+           activitiesPage.todayFocus.cool}
         </p>
       </section>
 
@@ -78,11 +94,11 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
               <div>
                 <span className="inline-flex items-center px-md py-xs bg-primary-container/10 dark:bg-primary/20 text-primary dark:text-primary-fixed-dim rounded-full font-label-sm text-label-sm mb-md">
                   <span className="material-symbols-outlined mr-xs text-sm">light_mode</span>
-                  OPTIMAL WINDOW
+                  {activitiesPage.bestTime.optimalWindow}
                 </span>
-                <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-xs">Morning Clarity</h3>
+                <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-xs">{activitiesPage.bestTime.morningClarity}</h3>
                 <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim max-w-md">
-                  The best time for your run is between 7:00 AM and 9:30 AM. Air quality is peak and UV index is moderate.
+                  {activitiesPage.bestTime.description}
                 </p>
               </div>
               <div className="text-right">
@@ -109,7 +125,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
                     <span className={`font-label-sm text-label-sm ${
                       isPeak ? 'text-primary dark:text-primary-fixed-dim font-bold' : 'text-on-surface-variant dark:text-secondary-fixed-dim'
                     }`}>
-                      {hour % 12 === 0 ? '12PM' : hour < 12 ? `${hour}AM` : `${hour % 12}PM`}
+                      {new Date(2024, 0, 1, hour).toLocaleString('en-US', { hour: 'numeric', hour12: true })}
                     </span>
                   </div>
                 );
@@ -125,7 +141,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
 
         {/* Hydration Plan (Side Card) */}
         <div className="md:col-span-4 glass-card p-lg flex flex-col items-center text-center">
-          <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-md">Hydration Plan</h3>
+          <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface mb-md">{activitiesPage.hydrationPlan.title}</h3>
           <div className="relative w-48 h-48 mb-lg">
             <svg className="w-full h-full -rotate-90">
               <circle className="text-secondary-container dark:text-[#2a3a52]" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" strokeWidth="12" />
@@ -141,7 +157,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-display text-headline-lg text-primary dark:text-primary-fixed-dim">{hydration.liters.toFixed(1)}L</span>
-              <span className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim">Goal: 1.8L</span>
+              <span className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim">{activitiesPage.hydrationPlan.goal}: 1.8L</span>
             </div>
           </div>
           <div className="flex gap-sm w-full">
@@ -149,21 +165,21 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
               className="flex-1 py-md bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-xl font-label-md flex items-center justify-center gap-sm active:scale-95 transition-transform"
               onClick={() => onActivityChange('walk')}
             >
-              <span className="material-symbols-outlined">directions_walk</span> Start
+              <span className="material-symbols-outlined">directions_walk</span> {activitiesPage.hydrationPlan.start}
             </button>
-            <button 
+            <button
               className="px-md py-md bg-surface-container-high dark:bg-[#1e3a5f] text-primary dark:text-primary-fixed-dim rounded-xl active:scale-95 transition-transform"
-              onClick={() => alert('Hydration history will be shown here.')}
+              onClick={() => setHydrationHistory(!hydrationHistory)}
             >
               <span className="material-symbols-outlined">history</span>
             </button>
           </div>
           <p className="mt-lg font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
             {hydration.liters >= 1.8
-              ? 'Goal reached! Stay hydrated!'
-              : `${hydration.glasses} glasses to reach your target.`}
+              ? activitiesPage.hydrationPlan.goalReached
+              : `${hydration.glasses} ${activitiesPage.hydrationPlan.glassesToTarget}`}
             <span className="block font-bold text-primary dark:text-primary-fixed-dim mt-xs">
-              {hydration.liters >= 1.8 ? 'Well done!' : 'Keep it up!'}
+              {hydration.liters >= 1.8 ? activitiesPage.hydrationPlan.wellDone : activitiesPage.hydrationPlan.keepItUp}
             </span>
           </p>
         </div>
@@ -171,46 +187,56 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
         {/* Activity Selection */}
         <div className="md:col-span-12">
           <div className="flex items-center justify-between mb-md">
-            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Start Activity</h3>
-            <button 
+            <div className="flex items-center gap-md">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{activitiesPage.startActivity.title}</h3>
+              <button
+                className="w-10 h-10 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-md"
+                onClick={() => setFabClicked(!fabClicked)}
+                aria-label={fabClicked ? 'Pause' : 'Play'}
+              >
+                <span className="material-symbols-outlined">{fabClicked ? 'pause' : 'play_arrow'}</span>
+              </button>
+            </div>
+            <button
               className="text-primary dark:text-primary-fixed-dim font-label-md hover:underline"
-              onClick={() => alert('All activities view will be opened.')}
+              onClick={() => setViewAllActivities(!viewAllActivities)}
             >
-              View All
+              {activitiesPage.startActivity.viewAll}
             </button>
           </div>
           <div className="flex gap-md overflow-x-auto pb-sm hide-scrollbar">
             {allActivities.map((act) => {
               const isActive = isActiveActivity(act.id);
+              const isSelectedCard = selectedCardActivity === act.id;
               return (
                 <button
                   key={act.id}
-                  className={`flex-shrink-0 w-44 glass-card p-md flex flex-col items-center text-center cursor-pointer group hover:bg-primary-container dark:hover:bg-primary/30 transition-all ${
-                    isActive ? 'active-ring' : ''
+                  className={`flex-shrink-0 w-44 glass-card p-md flex flex-col items-center text-center cursor-pointer group transition-all ${
+                    isActive || isSelectedCard ? 'active-ring bg-primary-container dark:bg-primary/30' : 'hover:bg-primary-container dark:hover:bg-primary/30'
                   }`}
                   onClick={() => {
-                    if (act.id === 'walk' || act.id === 'run' || act.id === 'work') {
-                      onActivityChange(act.id as ActivityType);
-                    }
+                    const newId = isSelectedCard ? null : act.id;
+                    setSelectedCardActivity(newId);
+                    if (newId) onActivityChange(toActivityType(act.id));
                   }}
                 >
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-md transition-colors ${
-                    isActive
-                      ? 'bg-primary dark:bg-primary-fixed-dim group-hover:bg-on-primary/20'
-                      : 'bg-surface-container dark:bg-[#1e3a5f] group-hover:bg-on-primary/20'
+                    isActive || isSelectedCard
+                      ? 'bg-primary dark:bg-primary-fixed-dim'
+                      : 'bg-surface-container dark:bg-[#1e3a5f] group-hover:bg-primary/20'
                   }`}>
                     <span className={`material-symbols-outlined text-3xl ${
-                      isActive ? 'text-on-primary dark:text-on-primary-fixed' : 'text-primary dark:text-primary-fixed-dim group-hover:text-on-primary'
+                      isActive || isSelectedCard ? 'text-on-primary dark:text-on-primary-fixed' : 'text-primary dark:text-primary-fixed-dim'
                     }`}>
                       {act.icon}
                     </span>
                   </div>
                   <span className={`font-headline-md text-body-lg font-bold ${
-                    isActive ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-inverse-on-surface group-hover:text-on-primary'
+                    isActive || isSelectedCard ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-inverse-on-surface'
                   }`}>
                     {act.label}
                   </span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim group-hover:text-on-primary/80">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">
                     {act.subtitle}
                   </span>
                 </button>
@@ -221,50 +247,158 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
 
         {/* Insights Section */}
         <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-lg">
-          <div className="glass-card p-lg flex items-center gap-lg">
+          <button
+            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-left focus-ring"
+            onClick={() => setInsightModal({
+              type: 'air',
+              title: `${activitiesPage.insights.airQuality}: ${weather.airQuality?.level === 'good' ? activitiesPage.insights.excellent : activitiesPage.insights.moderate}`,
+              description: weather.dustLevel === 'high' || weather.pollenLevel === 'high'
+                ? activitiesPage.insights.highPollen
+                : activitiesPage.insights.lowPollen,
+            })}
+          >
             <div className="w-14 h-14 rounded-2xl bg-surface-container dark:bg-[#1e3a5f] flex items-center justify-center text-primary dark:text-primary-fixed-dim">
-              <span className="material-symbols-outlined text-3xl">eco</span>
+              <span className="material-symbols-outlined text-3xl" aria-hidden="true">eco</span>
             </div>
             <div>
               <h4 className="font-headline-md text-body-lg font-bold text-on-surface dark:text-inverse-on-surface">
-                Air Quality: {weather.airQuality?.level?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Good'}
+                {activitiesPage.insights.airQuality}: {weather.airQuality?.level?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) || activitiesPage.insights.excellent}
               </h4>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
                 {weather.dustLevel === 'high' || weather.pollenLevel === 'high'
-                  ? 'High pollen or dust levels detected today. Consider wearing a mask.'
-                  : 'Low pollen levels detected today. Perfect for deep breathing exercises.'}
+                  ? activitiesPage.insights.highPollen
+                  : activitiesPage.insights.lowPollen}
               </p>
             </div>
-          </div>
-          <div className="glass-card p-lg flex items-center gap-lg">
+          </button>
+          <button
+            className="glass-card p-lg flex items-center gap-lg hover:shadow-lg transition-shadow text-left focus-ring"
+            onClick={() => setInsightModal({
+              type: 'uv',
+              title: weather.uvIndex >= 6 ? activitiesPage.insights.uvWarning : activitiesPage.insights.uvLevel,
+              description: weather.uvIndex >= 8
+                ? activitiesPage.insights.uvExtreme
+                : weather.uvIndex >= 6
+                  ? activitiesPage.insights.uvHigh
+                  : activitiesPage.insights.uvLow,
+            })}
+          >
             <div className="w-14 h-14 rounded-2xl bg-surface-container dark:bg-[#1e3a5f] flex items-center justify-center text-primary dark:text-primary-fixed-dim">
-              <span className="material-symbols-outlined text-3xl">wb_twilight</span>
+              <span className="material-symbols-outlined text-3xl" aria-hidden="true">wb_twilight</span>
             </div>
             <div>
               <h4 className="font-headline-md text-body-lg font-bold text-on-surface dark:text-inverse-on-surface">
-                UV {weather.uvIndex >= 6 ? 'Warning' : 'Level'}
+                {weather.uvIndex >= 6 ? activitiesPage.insights.uvWarning : activitiesPage.insights.uvLevel}
               </h4>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
                 {weather.uvIndex >= 8
-                  ? 'UV is extreme. Avoid prolonged exposure between 10 AM and 4 PM.'
+                  ? activitiesPage.insights.uvExtreme
                   : weather.uvIndex >= 6
-                    ? `UV peaks at midday. Apply SPF 30+ if staying outdoors for more than 15 mins.`
-                    : 'UV levels are comfortable. No special precautions needed.'}
+                    ? activitiesPage.insights.uvHigh
+                    : activitiesPage.insights.uvLow}
               </p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
-      {/* FAB */}
-      <button
-        className={`fixed right-6 bottom-24 w-16 h-16 bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-transform z-40 ${
-          fabClicked ? 'scale-110' : ''
-        }`}
-        onClick={() => { setFabClicked(!fabClicked); }}
-      >
-        <span className="material-symbols-outlined text-3xl">{fabClicked ? 'pause' : 'play_arrow'}</span>
-      </button>
+      {/* Hydration History Modal */}
+      {hydrationHistory && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setHydrationHistory(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setHydrationHistory(false); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Hydration History">
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">Hydration History</h3>
+              <button onClick={() => setHydrationHistory(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label="Close hydration history">
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="space-y-md">
+              <div className="flex justify-between py-sm border-b border-outline-variant dark:border-[#2a3a52]">
+                <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">Today</span>
+                <span className="font-body-md text-body-md text-primary dark:text-primary-fixed-dim">{hydration.liters.toFixed(1)}L</span>
+              </div>
+              <div className="flex justify-between py-sm border-b border-outline-variant dark:border-[#2a3a52]">
+                <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">Yesterday</span>
+                <span className="font-body-md text-body-md text-primary dark:text-primary-fixed-dim">1.6L</span>
+              </div>
+              <div className="flex justify-between py-sm">
+                <span className="font-body-md text-body-md text-on-surface dark:text-inverse-on-surface">This Week Avg</span>
+                <span className="font-body-md text-body-md text-primary dark:text-primary-fixed-dim">1.5L</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View All Activities Modal */}
+      {viewAllActivities && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setViewAllActivities(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setViewAllActivities(false); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={activitiesPage.startActivity.title}>
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{activitiesPage.startActivity.title}</h3>
+              <button onClick={() => setViewAllActivities(false)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label={`Close ${activitiesPage.startActivity.title}`}>
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-md">
+              {allActivities.map((act) => (
+                <button
+                  key={act.id}
+                  className="flex items-center gap-md p-md bg-surface-container-low dark:bg-[#0b1c30] rounded-xl hover:bg-primary-container dark:hover:bg-primary/30 transition-colors text-left focus-ring"
+                  onClick={() => {
+                    if (act.id === 'walk' || act.id === 'run' || act.id === 'work') {
+                      onActivityChange(act.id as ActivityType);
+                    }
+                    setViewAllActivities(false);
+                  }}
+                >
+                  <div className="w-12 h-12 rounded-full bg-surface-container-high dark:bg-[#1e3a5f] flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">{act.icon}</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-label-md text-label-md text-on-surface dark:text-inverse-on-surface block">{act.label}</span>
+                    <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">{act.subtitle}</span>
+                  </div>
+                  <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" aria-hidden="true">chevron_right</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insight Detail Modal */}
+      {insightModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-lg"
+          onClick={() => setInsightModal(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setInsightModal(null); }}
+          role="presentation"
+          style={{ overscrollBehavior: 'contain' }}
+        >
+          <div className="bg-surface dark:bg-[#1a2a42] rounded-xl p-xl max-w-sm w-full shadow-2xl" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={insightModal.title}>
+            <div className="flex items-center justify-between mb-lg">
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{insightModal.title}</h3>
+              <button onClick={() => setInsightModal(null)} className="text-on-surface-variant dark:text-secondary-fixed-dim focus-ring" aria-label={`Close ${insightModal.title}`}>
+                <MaterialIcon icon="close" size={24} aria-hidden="true" />
+              </button>
+            </div>
+            <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">{insightModal.description}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

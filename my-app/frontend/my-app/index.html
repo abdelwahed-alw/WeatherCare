@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#004ac6" />
+    <meta name="theme-color" content="#004ac6" id="theme-color-meta" />
     <meta name="description" content="Aura Weather & Wellness - Smart weather and health recommendations" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Aura Weather & Wellness</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,7 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-background dark:bg-on-surface text-on-surface dark:text-inverse-on-surface font-body antialiased min-h-screen pb-32">
+  <body class="bg-background dark:bg-on-surface text-on-surface dark:text-inverse-on-surface font-body antialiased min-h-screen">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

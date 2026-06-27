@@ -120,6 +120,10 @@ export function WalkIcon({ size = 24, className }: IconProps) {
   return <MaterialIcon icon="directions_walk" size={size} className={className} />;
 }
 
+export function PoolIcon({ size = 24, className }: IconProps) {
+  return <MaterialIcon icon="pool" size={size} className={className} />;
+}
+
 export function RunIcon({ size = 24, className }: IconProps) {
   return <MaterialIcon icon="directions_run" size={size} className={className} />;
 }

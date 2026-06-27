@@ -33,8 +33,8 @@ export interface City {
   nameAr: string;
   nameFr: string;
   region: string;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
 }
 
 export interface ClothingRecommendation {
@@ -69,3 +69,30 @@ export interface Recommendations {
   hydration: HydrationRecommendation;
   allergy: AllergyAlert;
 }
+
+// ─── Auth Types ─────────────────────────────────────────────────────────
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  preferences?: string[];
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+  preferences: string[];
+}
+
+export interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export type AuthView = 'login' | 'register-step1' | 'register-step2';

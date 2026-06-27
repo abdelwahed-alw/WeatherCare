@@ -1,4 +1,4 @@
-import type { WeatherData, City, Recommendations, ActivityType } from './types';
+import type { WeatherData, City, Recommendations, ActivityType, RegisterPayload, LoginPayload, AuthResponse, AuthUser } from './types';
 
 const BASE = '/api';
 
@@ -45,4 +45,56 @@ export async function fetchRecommendations(cityName: string, activity: ActivityT
   return fetchJSON<RecommendationsResponse>(
     `${BASE}/weather/recommendations?city=${encodeURIComponent(cityName)}&activity=${activity}`
   );
+}
+
+// ─── Auth API ────────────────────────────────────────────────────────────
+
+async function authFetch<T>(url: string, body: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+
+export async function register(payload: RegisterPayload): Promise<AuthResponse> {
+  return authFetch<AuthResponse>(`${BASE}/auth/register`, payload);
+}
+
+export async function login(payload: LoginPayload): Promise<AuthResponse> {
+  return authFetch<AuthResponse>(`${BASE}/auth/login`, payload);
+}
+
+export async function fetchMe(token: string): Promise<{ user: AuthUser }> {
+  const res = await fetch(`${BASE}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Session expired');
+  return res.json();
+}
+
+export interface WeatherSceneImage {
+  url: string;
+  condition: string;
+  activity: string;
+  label: string;
+}
+
+export async function fetchWeatherImage(condition: string, activity: string): Promise<WeatherSceneImage> {
+  return fetchJSON<WeatherSceneImage>(
+    `${BASE}/weather/image?condition=${encodeURIComponent(condition)}&activity=${encodeURIComponent(activity)}`
+  );
+}
+
+export async function updatePreferences(token: string, preferences: string[]): Promise<{ preferences: string[] }> {
+  const res = await fetch(`${BASE}/auth/preferences`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ preferences }),
+  });
+  if (!res.ok) throw new Error('Failed to update preferences');
+  return res.json();
 }
