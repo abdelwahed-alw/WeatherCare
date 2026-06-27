@@ -45,6 +45,7 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
   const allActivities: ActivityOption[] = activitiesPage.activities;
   const temp = weather.temperature;
   const conditionLabel = weather.condition.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const [consumed, setConsumed] = useState(0);
   const [fabClicked, setFabClicked] = useState(false);
   const [hydrationHistory, setHydrationHistory] = useState(false);
   const [insightModal, setInsightModal] = useState<{ type: string; title: string; description: string } | null>(null);
@@ -57,9 +58,15 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
   const range = maxTemp - minTemp || 1;
 
   const hydration = recommendations.hydration;
+  const goal = hydration.liters;
   const circumference = 2 * Math.PI * 88;
-  const progress = Math.min(hydration.liters / 1.8, 1);
+  const currentHydration = Math.min(consumed, goal);
+  const progress = goal > 0 ? currentHydration / goal : 0;
   const offset = circumference - (progress * circumference);
+
+  const addWater = (amount: number) => {
+    setConsumed(prev => Math.min(prev + amount, goal));
+  };
 
   const toActivityType = (id: string): ActivityType => {
     if (id === 'run') return 'run';
@@ -155,20 +162,20 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="font-display text-headline-lg text-primary dark:text-primary-fixed-dim">{hydration.liters.toFixed(1)}L</span>
-              <span className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim">{activitiesPage.hydrationPlan.goal}: 1.8L</span>
+              <span className="font-display text-headline-lg text-primary dark:text-primary-fixed-dim">{currentHydration.toFixed(1)}L</span>
+              <span className="font-label-md text-label-md text-on-surface-variant dark:text-secondary-fixed-dim">{activitiesPage.hydrationPlan.goal}: {goal.toFixed(1)}L</span>
             </div>
           </div>
           <div className="flex gap-sm w-full">
             <button
               className={`flex-1 py-md rounded-xl font-label-md flex items-center justify-center gap-sm active:scale-95 transition-all ${
-                activity === 'walk'
+                consumed >= goal
                   ? 'bg-primary-fixed dark:bg-primary/30 text-on-primary-fixed dark:text-primary-fixed-dim ring-2 ring-primary'
                   : 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed'
               }`}
-              onClick={() => onActivityChange('walk')}
+              onClick={() => addWater(0.25)}
             >
-              <span className="material-symbols-outlined">directions_walk</span> {activitiesPage.hydrationPlan.start}
+              <span className="material-symbols-outlined">water_drop</span> +0.25L
             </button>
             <button
               className="px-md py-md bg-surface-container-high dark:bg-[#1e3a5f] text-primary dark:text-primary-fixed-dim rounded-xl active:scale-95 transition-transform"
@@ -178,11 +185,11 @@ export default function ActivitiesView({ weather, recommendations, activity, onA
             </button>
           </div>
           <p className="mt-lg font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">
-            {hydration.liters >= 1.8
+            {consumed >= goal
               ? activitiesPage.hydrationPlan.goalReached
-              : `${hydration.glasses} ${activitiesPage.hydrationPlan.glassesToTarget}`}
+              : `${Math.ceil((goal - consumed) / 0.25)} ${activitiesPage.hydrationPlan.glassesToTarget}`}
             <span className="block font-bold text-primary dark:text-primary-fixed-dim mt-xs">
-              {hydration.liters >= 1.8 ? activitiesPage.hydrationPlan.wellDone : activitiesPage.hydrationPlan.keepItUp}
+              {consumed >= goal ? activitiesPage.hydrationPlan.wellDone : activitiesPage.hydrationPlan.keepItUp}
             </span>
           </p>
         </div>

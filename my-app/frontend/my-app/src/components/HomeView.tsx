@@ -83,6 +83,41 @@ export default function HomeView({ weather, recommendations, cityName, activity 
   const activityLabel = getActivityLabel();
   const conditionBadge = getConditionBadge();
 
+  type ActivityRating = { badge: string; badgeClass: string };
+
+  function getActivityBadge(label: string): ActivityRating {
+    const t = temperature, uv = uvIndex, aq = airQuality?.level;
+    const poorAir = aq === 'unhealthy' || aq === 'unhealthy-sensitive';
+    const hot = t >= 35, warm = t >= 30, mild = t >= 18, cool = t >= 10, cold = t < 10;
+    const highUv = uv >= 8, modUv = uv >= 6;
+
+    switch (label) {
+      case 'Walking':
+        if (hot || poorAir) return { badge: 'MODERATE', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' };
+        if (warm || modUv) return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+        return { badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' };
+      case 'Running':
+        if (hot || highUv || poorAir) return { badge: 'POOR', badgeClass: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300' };
+        if (warm || modUv) return { badge: 'MODERATE', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' };
+        if (cool) return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+        return { badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' };
+      case 'Cycling':
+        if (hot || poorAir) return { badge: 'MODERATE', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' };
+        if (warm || modUv || condition === 'windy') return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+        return { badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' };
+      case 'Yoga':
+        if (poorAir || condition === 'windy') return { badge: 'MODERATE', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' };
+        if (hot || cold) return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+        return { badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' };
+      case 'Swimming':
+        if (poorAir || cold) return { badge: 'MODERATE', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' };
+        if (warm) return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+        return { badge: 'EXCELLENT', badgeClass: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' };
+      default:
+        return { badge: 'GOOD', badgeClass: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' };
+    }
+  }
+
   const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
     Walking: WalkIcon,
     Running: RunIcon,
@@ -310,6 +345,7 @@ export default function HomeView({ weather, recommendations, cityName, activity 
         <div className="flex gap-lg overflow-x-auto pb-md custom-scrollbar">
           {activityCards.map((card, i) => {
             const isSelected = selectedActivity === card.label;
+            const rating = getActivityBadge(card.label);
             return (
               <button
                 key={i}
@@ -320,7 +356,7 @@ export default function HomeView({ weather, recommendations, cityName, activity 
                 }`}
                 onClick={() => setSelectedActivity(isSelected ? null : card.label)}
                 aria-pressed={isSelected}
-                aria-label={`${card.label}: ${card.badge}`}
+                aria-label={`${card.label}: ${rating.badge}`}
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                   isSelected
@@ -332,8 +368,8 @@ export default function HomeView({ weather, recommendations, cityName, activity 
                 <span className={`font-label-md text-label-md ${isSelected ? 'text-primary dark:text-primary-fixed-dim font-bold' : 'text-on-surface dark:text-inverse-on-surface'}`}>
                   {card.label}
                 </span>
-                <span className={`px-sm py-xs text-xs font-bold rounded-full ${card.badgeClass}`}>
-                  {card.badge}
+                <span className={`px-sm py-xs text-xs font-bold rounded-full ${rating.badgeClass}`}>
+                  {rating.badge}
                 </span>
               </button>
             );

@@ -271,65 +271,68 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
       {/* City Picker Modal */}
       {showCityPicker && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-lg animate-in"
+          className="fixed inset-0 z-50 bg-background dark:bg-[#051424] flex flex-col animate-in"
           onClick={() => { setShowCityPicker(false); setCitySearch(''); }}
           onKeyDown={(e) => { if (e.key === 'Escape') { setShowCityPicker(false); setCitySearch(''); } }}
           role="presentation"
           style={{ overscrollBehavior: 'contain' }}
         >
-          <div
-            className="bg-surface dark:bg-[#0f1d30] rounded-3xl p-0 max-w-sm w-full shadow-2xl max-h-[80vh] flex flex-col overflow-hidden border border-outline-variant/20 dark:border-white/5"
-            onClick={e => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label={profilePage.preferences.defaultCity}
-          >
-            {/* Header */}
-            <div className="p-xl pb-0">
-              <div className="flex items-center justify-between mb-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style={{ fontSize: '22px', fontVariationSettings: "'FILL' 1" }}>travel_explore</span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{profilePage.preferences.defaultCity}</h3>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim">{moroccanCities.length} cities available</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => { setShowCityPicker(false); setCitySearch(''); }}
-                  className="w-9 h-9 rounded-xl hover:bg-surface-container-high dark:hover:bg-white/10 flex items-center justify-center transition-colors focus-ring text-on-surface-variant dark:text-secondary-fixed-dim"
-                  aria-label="Close city picker"
-                >
-                  <MaterialIcon icon="close" size={20} aria-hidden="true" />
-                </button>
-              </div>
+          {/* Top AppBar */}
+          <header className="w-full top-0 sticky bg-surface dark:bg-[#0f1d30] shadow-sm z-40 flex items-center justify-between px-md py-sm" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.5rem)' }}>
+            <div className="flex items-center gap-md">
+              <button className="active:scale-95 duration-200 p-xs rounded-full hover:bg-surface-container-high dark:hover:bg-white/10 transition-colors" onClick={() => { setShowCityPicker(false); setCitySearch(''); }}>
+                <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim">location_on</span>
+              </button>
+              <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">{profilePage.preferences.defaultCity}</h1>
+            </div>
+            <div className="flex items-center gap-md">
+              <button className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim font-semibold hover:bg-surface-container-high dark:hover:bg-white/10 px-md py-xs rounded-lg transition-all" onClick={() => { setShowCityPicker(false); setCitySearch(''); }}>
+                Cancel
+              </button>
+            </div>
+          </header>
 
-              {/* Search */}
-              <div className="relative mb-lg">
-                <span className="absolute start-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 dark:text-secondary-fixed-dim/60">
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>search</span>
-                </span>
-                <input
-                  type="text"
-                  value={citySearch}
-                  onChange={e => setCitySearch(e.target.value)}
-                  placeholder="Search by city or region..."
-                  className="w-full bg-surface-container-high dark:bg-white/5 text-on-surface dark:text-inverse-on-surface rounded-2xl ps-11 pe-10 py-3.5 font-body-md text-body-md outline-none focus:ring-2 focus:ring-primary dark:focus:ring-secondary transition-all placeholder:text-on-surface-variant/40 dark:placeholder:text-secondary-fixed-dim/40 border border-outline-variant/30 dark:border-white/5"
-                />
-                {citySearch && (
-                  <button
-                    onClick={() => setCitySearch('')}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-on-surface-variant dark:text-secondary-fixed-dim/50 dark:hover:text-secondary-fixed-dim"
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
-                  </button>
-                )}
-              </div>
+          <main className="flex-1 overflow-y-auto px-lg py-xl">
+            {/* Header Title */}
+            <div className="mb-xl">
+              <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-inverse-on-surface">{profilePage.preferences.defaultCity}</h2>
+              <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim mt-sm">Search for a city to see weather and wellness insights.</p>
             </div>
 
-            {/* City List */}
-            <div className="flex-1 overflow-y-auto px-xl pb-xl custom-scrollbar">
+            {/* Search */}
+            <div className="space-y-lg">
+              <div className="relative group">
+                <div className="flex items-center bg-secondary-container dark:bg-[#1e3a5f] rounded-lg px-md py-sm border-2 border-transparent transition-all duration-200 focus-within:bg-surface-container-lowest dark:focus-within:bg-[#0f1d30] focus-within:border-primary dark:focus-within:border-primary-fixed-dim focus-within:shadow-[0px_4px_20px_rgba(0,0,0,0.04)]">
+                  <span className="material-symbols-outlined text-on-secondary-container dark:text-secondary-fixed-dim me-sm" style={{ fontSize: '20px' }}>search</span>
+                  <input
+                    type="text"
+                    value={citySearch}
+                    onChange={e => setCitySearch(e.target.value)}
+                    placeholder="Search city or zip code..."
+                    className="bg-transparent border-none focus:ring-0 w-full text-body-lg font-body-lg text-on-surface dark:text-inverse-on-surface placeholder:text-on-secondary-container/60 dark:placeholder:text-secondary-fixed-dim/60 outline-none"
+                    autoFocus
+                  />
+                  {citySearch && (
+                    <button className="text-primary dark:text-primary-fixed-dim font-label-md text-label-md hover:underline" onClick={() => setCitySearch('')}>Clear</button>
+                  )}
+                </div>
+              </div>
+
+              {/* Current Location */}
+              <button className="flex items-center gap-md w-full p-md bg-surface-container-low dark:bg-[#0b1c30] border border-outline-variant dark:border-[#2a3a52] rounded-lg hover:bg-surface-container dark:hover:bg-[#1a2a42] transition-colors active:scale-[0.98] duration-150" onClick={() => { setShowCityPicker(false); setCitySearch(''); }}>
+                <div className="w-10 h-10 rounded-full bg-primary dark:bg-primary-fixed-dim flex items-center justify-center text-on-primary dark:text-on-primary-fixed">
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>near_me</span>
+                </div>
+                <div className="text-start">
+                  <p className="font-label-md text-label-md text-primary dark:text-primary-fixed-dim font-bold">Current Location</p>
+                  <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">Using GPS</p>
+                </div>
+                <span className="material-symbols-outlined ms-auto text-on-surface-variant dark:text-secondary-fixed-dim no-flip" style={{ fontSize: '20px' }}>chevron_right</span>
+              </button>
+            </div>
+
+            {/* All Cities */}
+            <section className="mt-2xl">
               {filteredCities.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-2xl">
                   <div className="w-16 h-16 rounded-2xl bg-surface-container-high dark:bg-white/5 flex items-center justify-center mb-md">
@@ -339,49 +342,53 @@ export default function ProfileView({ userName, isDark, onToggleDark, onLogout, 
                   <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim text-center">Try a different search term</p>
                 </div>
               ) : (
-                <div className="space-y-xs">
-                  {filteredCities.map((c, idx) => (
-                    <button
-                      key={c.name}
-                      className={`w-full flex items-center gap-4 p-3.5 rounded-2xl transition-all text-start focus-ring group ${
-                        city.name === c.name
-                          ? 'bg-primary/10 dark:bg-primary/20 ring-1 ring-primary/30 dark:ring-primary/40'
-                          : 'hover:bg-surface-container-high dark:hover:bg-white/5 active:scale-[0.98]'
-                      }`}
-                      style={{ animationDelay: `${idx * 30}ms` }}
-                      onClick={() => {
-                        onCityChange(c);
-                        setShowCityPicker(false);
-                        setCitySearch('');
-                      }}
-                    >
-                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
-                        city.name === c.name
-                          ? 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed shadow-lg shadow-primary/30 dark:shadow-primary/20'
-                          : 'bg-surface-container-high dark:bg-white/5 text-primary dark:text-primary-fixed-dim group-hover:scale-110'
-                      }`}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '22px', fontVariationSettings: city.name === c.name ? "'FILL' 1" : "'FILL' 0" }}>location_on</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-label-md text-label-md block truncate text-on-surface dark:text-inverse-on-surface font-medium">{c.name}</span>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50 dark:text-secondary-fixed-dim/50">pin_drop</span>
-                          <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-secondary-fixed-dim truncate">{c.region}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                  {filteredCities.map((c) => {
+                    const isSelected = city.name === c.name;
+                    return (
+                      <button
+                        key={c.name}
+                        className={`bg-surface-container-lowest dark:bg-[#0f1d30] border ${
+                          isSelected
+                            ? 'border-primary dark:border-primary-fixed-dim ring-2 ring-primary/30 dark:ring-primary-fixed-dim/30'
+                            : 'border-outline-variant dark:border-[#2a3a52]'
+                        } p-md rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-40 relative overflow-hidden text-start active:scale-[0.98] focus-ring`}
+                        onClick={() => {
+                          onCityChange(c);
+                          setShowCityPicker(false);
+                          setCitySearch('');
+                        }}
+                      >
+                        <div className="flex justify-between items-start z-10">
+                          <div>
+                            <p className="font-headline-md text-headline-md text-on-surface dark:text-inverse-on-surface">{c.name}</p>
+                            <p className="font-body-md text-body-md text-on-surface-variant dark:text-secondary-fixed-dim">Morocco</p>
+                          </div>
+                          <div className={`font-label-sm text-label-sm px-sm py-xs rounded-full ${
+                            isSelected
+                              ? 'bg-primary dark:bg-primary-fixed-dim text-on-primary dark:text-on-primary-fixed'
+                              : 'bg-primary-fixed dark:bg-primary/20 text-on-primary-fixed dark:text-primary-fixed-dim'
+                          }`}>
+                            {c.name === 'Marrakech' ? '28°C' : c.name === 'Casablanca' ? '22°C' : c.name === 'Rabat' ? '21°C' : c.name === 'Fes' ? '24°C' : c.name === 'Tangier' ? '23°C' : c.name === 'Agadir' ? '26°C' : '25°C'}
+                          </div>
                         </div>
-                      </div>
-                      {city.name === c.name ? (
-                        <div className="w-7 h-7 rounded-full bg-primary dark:bg-primary-fixed-dim flex items-center justify-center flex-shrink-0">
-                          <span className="material-symbols-outlined text-on-primary dark:text-on-primary-fixed" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>check</span>
+                        <div className="flex items-center gap-sm z-10">
+                          <span className="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style={{ fontSize: '20px' }}>wb_sunny</span>
+                          <span className="font-body-md text-body-md text-primary dark:text-primary-fixed-dim">Sunny</span>
+                          {isSelected && (
+                            <span className="ms-auto material-symbols-outlined text-primary dark:text-primary-fixed-dim" style={{ fontSize: '18px', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                          )}
                         </div>
-                      ) : (
-                        <span className="material-symbols-outlined text-on-surface-variant/20 dark:text-secondary-fixed-dim/20 group-hover:text-on-surface-variant/40 dark:group-hover:text-secondary-fixed-dim/40 transition-colors flex-shrink-0 no-flip" style={{ fontSize: '20px' }}>chevron_right</span>
-                      )}
-                    </button>
-                  ))}
+                        <div className="absolute -end-4 -bottom-4 opacity-10 pointer-events-none">
+                          <span className="material-symbols-outlined text-[120px] text-primary dark:text-primary-fixed-dim" style={{ fontSize: '120px' }}>wb_sunny</span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
-            </div>
-          </div>
+            </section>
+          </main>
         </div>
       )}
 
